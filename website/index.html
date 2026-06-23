@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BallersPlay — Connect. Play. Dominate.</title>
+  <meta name="description" content="BallersPlay connects sports lovers by organizing, hosting, and showcasing local sports events. Find your next game." />
+
+  <!-- ============ FONTS ============ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- ============ ICONS (Font Awesome) ============ -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    /* =====================================================
+       DESIGN TOKENS
+    ===================================================== */
+    :root {
+      --bg:        #000000;
+      --bg-soft:   #0a0a0a;
+      --bg-card:   #101012;
+      --line:      rgba(255,255,255,0.08);
+      --text:      #ffffff;
+      --muted:     #9a9a9f;
+      --accent:    #c6ff00;   /* electric lime */
+      --accent-2:  #00e676;   /* neon green    */
+      --accent-ink:#0a0f00;
+      --radius:    16px;
+      --maxw:      1240px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: 'Montserrat', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--accent); color: var(--accent-ink); }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #1f1f22; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* Headings */
+    .display {
+      font-family: 'Anton', 'Montserrat', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      line-height: 0.98;
+      text-transform: uppercase;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 22px;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 28px; height: 2px;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    .section { padding: 120px 0; position: relative; }
+
+    /* =====================================================
+       BUTTONS
+    ===================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 16px 30px;
+      border-radius: 50px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform .25s ease, background-color .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease;
+      will-change: transform;
+    }
+    .btn i { transition: transform .25s ease; }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      box-shadow: 0 8px 30px rgba(198,255,0,0.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(198,255,0,0.45);
+    }
+    .btn-primary:hover i { transform: translateX(5px); }
+    .btn-ghost {
+      background: transparent;
+      color: #fff;
+      border-color: rgba(255,255,255,0.25);
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    /* =====================================================
+       FIXED VIDEO BACKGROUND  (lag-free parallax)
+    ===================================================== */
+    .video-bg {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;            /* sits behind everything */
+      overflow: hidden;
+      background: #000;
+    }
+    .video-bg video {
+      position: absolute;
+      top: 50%; left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto; height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      will-change: transform;  /* GPU hint for zero lag */
+    }
+    /* darken overlay so white text pops */
+    .video-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.85) 100%);
+    }
+
+    /* =====================================================
+       NAVBAR
+    ===================================================== */
+    header.nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      transition: background-color .35s ease, box-shadow .35s ease, border-color .35s ease, padding .35s ease;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      padding: 22px 0;
+    }
+    header.nav.scrolled {
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 0;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    /* Logo: <img> with text fallback if file missing */
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo img { height: 42px; width: auto; }
+    .logo-text {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .logo-text span { color: var(--accent); }
+
+    .nav-links { display: flex; align-items: center; gap: 36px; }
+    .nav-links a {
+      font-size: 0.86rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      color: #e7e7ea;
+      position: relative;
+      padding: 6px 0;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 0; height: 2px;
+      background: var(--accent);
+      transition: width .3s ease;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta { display: flex; align-items: center; gap: 20px; }
+
+    /* Mobile menu */
+    .burger {
+      display: none;
+      background: none; border: none;
+      color: #fff; font-size: 1.4rem; cursor: pointer;
+    }
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: rgba(0,0,0,0.97);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 34px;
+      transform: translateX(100%);
+      transition: transform .4s cubic-bezier(.7,0,.2,1);
+    }
+    .mobile-menu.open { transform: translateX(0); }
+    .mobile-menu a {
+      font-family: 'Anton', sans-serif;
+      font-size: 2rem;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .mobile-menu a:hover { color: var(--accent); }
+    .mobile-close {
+      position: absolute; top: 26px; right: 26px;
+      background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer;
+    }
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+    .hero {
+      height: 100vh;
+      min-height: 640px;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .hero-content { max-width: 880px; }
+    .hero .eyebrow { color: var(--accent); }
+    .hero h1 {
+      font-size: clamp(3.2rem, 9vw, 8rem);
+      margin-bottom: 22px;
+    }
+    .hero h1 .hl { color: var(--accent); }
+    .hero p.sub {
+      font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+      color: #dcdce0;
+      font-weight: 500;
+      max-width: 560px;
+      margin-bottom: 40px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 16px; }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 34px; left: 50%;
+      transform: translateX(-50%);
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .scroll-hint .line {
+      width: 1px; height: 44px;
+      background: linear-gradient(var(--accent), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+    @keyframes scrollPulse {
+      0% { opacity: .2; transform: scaleY(.4); transform-origin: top; }
+      50% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+      100% { opacity: .2; transform: scaleY(.4); transform-origin: top; }
+    }
+
+    /* =====================================================
+       SOLID SECTIONS WRAPPER (scrolls over the video)
+    ===================================================== */
+    .content {
+      position: relative;
+      z-index: 1;
+      background: var(--bg);   /* solid so video only shows on hero */
+    }
+
+    .section-head { max-width: 720px; margin-bottom: 64px; }
+    .section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+    .section-head h2 {
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+      margin-bottom: 18px;
+    }
+    .section-head p { color: var(--muted); font-size: 1.05rem; }
+
+    /* =====================================================
+       WHAT WE DO  (grid)
+    ===================================================== */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .feature {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 44px 34px;
+      transition: transform .35s ease, border-color .35s ease, background-color .35s ease;
+      will-change: transform;
+    }
+    .feature:hover {
+      transform: translateY(-8px);
+      border-color: rgba(198,255,0,0.4);
+      background: #131316;
+    }
+    .feature .icon {
+      width: 64px; height: 64px;
+      display: grid; place-items: center;
+      border-radius: 14px;
+      background: rgba(198,255,0,0.1);
+      color: var(--accent);
+      font-size: 1.6rem;
+      margin-bottom: 26px;
+      transition: background-color .35s ease;
+    }
+    .feature:hover .icon { background: var(--accent); color: var(--accent-ink); }
+    .feature h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+    .feature p { color: var(--muted); font-size: 0.98rem; }
+    .feature .num {
+      font-family: 'Anton', sans-serif;
+      font-size: 0.9rem;
+      color: #2c2c30;
+      float: right;
+    }
+
+    /* =====================================================
+       1v1 TOURNAMENT (hype)
+    ===================================================== */
+    .tournament {
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(0,230,118,0.18), transparent 60%),
+        radial-gradient(900px 500px at 0% 120%, rgba(198,255,0,0.12), transparent 55%),
+        linear-gradient(160deg, #0c0f08 0%, #000 60%);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .tournament .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,230,118,0.12);
+      border: 1px solid rgba(0,230,118,0.35);
+      color: var(--accent-2);
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 9px 18px;
+      border-radius: 50px;
+      margin-bottom: 28px;
+    }
+    .tournament .badge .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent-2);
+      box-shadow: 0 0 0 0 rgba(0,230,118,0.7);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0,230,118,0.6); }
+      70% { box-shadow: 0 0 0 12px rgba(0,230,118,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,230,118,0); }
+    }
+    .tournament-inner { max-width: 860px; }
+    .tournament h2 {
+      font-size: clamp(2.6rem, 6.5vw, 5.4rem);
+      margin-bottom: 22px;
+    }
+    .tournament h2 .hl { color: var(--accent-2); }
+    .tournament p {
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      color: #d6d6da;
+      max-width: 620px;
+      margin-bottom: 38px;
+      font-weight: 500;
+    }
+    .vs-watermark {
+      position: absolute;
+      right: -40px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(10rem, 30vw, 26rem);
+      color: rgba(255,255,255,0.03);
+      pointer-events: none;
+      user-select: none;
+      line-height: 1;
+    }
+
+    /* =====================================================
+       EVENTS — UPCOMING
+    ===================================================== */
+    .event-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .event-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform .35s ease, border-color .35s ease;
+      will-change: transform;
+    }
+    .event-card:hover { transform: translateY(-8px); border-color: rgba(198,255,0,0.4); }
+    .event-media {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+    .event-media img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .6s cubic-bezier(.2,.7,.2,1);
+    }
+    .event-card:hover .event-media img { transform: scale(1.08); }
+    .event-media .tag {
+      position: absolute; top: 14px; left: 14px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-weight: 800;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-radius: 50px;
+    }
+    .event-body { padding: 26px 24px 28px; display: flex; flex-direction: column; flex: 1; }
+    .event-body h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: 14px; }
+    .event-meta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+    .event-meta span { color: var(--muted); font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
+    .event-meta i { color: var(--accent); width: 16px; }
+    .event-body .btn { margin-top: auto; justify-content: center; width: 100%; }
+
+    /* =====================================================
+       PAST EVENTS — MASONRY GALLERY
+    ===================================================== */
+    .gallery {
+      column-count: 3;
+      column-gap: 20px;
+    }
+    .gallery figure {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+    .gallery img {
+      width: 100%;
+      display: block;
+      transition: transform .7s cubic-bezier(.2,.7,.2,1);
+    }
+    .gallery figure:hover img { transform: scale(1.1); }
+    .gallery figcaption {
+      position: absolute;
+      inset: auto 0 0 0;
+      padding: 26px 18px 16px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: 0.4px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .gallery figure:hover figcaption { opacity: 1; transform: translateY(0); }
+
+    /* =====================================================
+       ABOUT
+    ===================================================== */
+    .about { position: relative; }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 70px;
+      align-items: center;
+    }
+    .about h2 { font-size: clamp(2.6rem, 6vw, 5rem); margin-bottom: 24px; }
+    .about p { color: #c9c9ce; font-size: 1.1rem; margin-bottom: 18px; max-width: 540px; }
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 40px;
+    }
+    .stat { border-left: 2px solid var(--accent); padding-left: 16px; }
+    .stat .n { font-family: 'Anton', sans-serif; font-size: 2.4rem; color: #fff; line-height: 1; }
+    .stat .l { color: var(--muted); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-top: 6px; }
+    .about-media {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 3 / 4;
+    }
+    .about-media img { width: 100%; height: 100%; object-fit: cover; }
+    .about-media .flag {
+      position: absolute; bottom: 18px; left: 18px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--line);
+      padding: 10px 16px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+    footer {
+      background: #050505;
+      border-top: 1px solid var(--line);
+      padding: 80px 0 36px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 50px;
+      border-bottom: 1px solid var(--line);
+    }
+    .footer-brand .logo-text { font-size: 1.8rem; }
+    .footer-brand p { color: var(--muted); margin-top: 16px; max-width: 320px; font-size: 0.95rem; }
+    .footer-col h4 {
+      font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase;
+      color: #fff; margin-bottom: 20px;
+    }
+    .footer-col a, .footer-col span {
+      display: block; color: var(--muted);
+      font-size: 0.95rem; margin-bottom: 12px;
+      transition: color .25s ease;
+    }
+    .footer-col a:hover { color: var(--accent); }
+    .socials { display: flex; gap: 14px; margin-top: 22px; }
+    .socials a {
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      color: #fff;
+      font-size: 1.1rem;
+      transition: all .3s ease;
+    }
+    .socials a:hover {
+      background: var(--accent); color: var(--accent-ink);
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+      padding-top: 28px;
+      color: var(--muted); font-size: 0.85rem;
+    }
+    .footer-bottom a { color: var(--muted); }
+    .footer-bottom a:hover { color: var(--accent); }
+
+    /* =====================================================
+       SCROLL REVEAL
+    ===================================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1);
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media (max-width: 980px) {
+      .feature-grid, .event-grid { grid-template-columns: 1fr 1fr; }
+      .gallery { column-count: 2; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .about-media { aspect-ratio: 16/10; max-height: 420px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 760px) {
+      .section { padding: 84px 0; }
+      .nav-links, .nav-cta .btn { display: none; }
+      .burger { display: block; }
+      .feature-grid, .event-grid { grid-template-columns: 1fr; }
+      .gallery { column-count: 1; }
+      .footer-top { grid-template-columns: 1fr; }
+      .hero p.sub { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       FIXED, LAG-FREE VIDEO BACKGROUND (z-index:-1)
+       >> Swap the <source> src below with your cinematic video <<
+  ========================================================== -->
+  <div class="video-bg">
+    <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1762013315117-1c8005ad2b41?auto=format&fit=crop&w=1600&q=70">
+      <source src="https://customer-assets.emergentagent.com/job_ba99f296-f872-493d-ac5a-68fd843b5323/artifacts/y2g5eoch_A_cinematic%2C_high-contrast_animation_based_on_a_white_silhouette_logo_of_a_soccer_player_on_a_solid__seed1924638786.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- =========================================================
+       NAVBAR
+  ========================================================== -->
+  <header class="nav" id="navbar">
+    <div class="container nav-inner">
+      <a href="#hero" class="logo" aria-label="BallersPlay home">
+        <!-- LOGO: looks for LogoEnhanced2.png in root. Falls back to text if missing. -->
+        <img src="LogoEnhanced2.png" alt="BallersPlay"
+             onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='inline';" />
+        <span class="logo-text" id="logoFallback" style="display:none;">BALLERS<span>PLAY</span></span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#what-we-do">What We Do</a>
+        <a href="#events">Events</a>
+        <a href="#tournament">1v1 Tournament</a>
+        <a href="#about">About</a>
+      </nav>
+
+      <div class="nav-cta">
+        <!-- REGISTER LINK (header) — replace href="#" -->
+        <a href="#" class="btn btn-primary">Register <i class="fa-solid fa-arrow-right"></i></a>
+        <button class="burger" id="burger" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" id="mobileClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+    <a href="#what-we-do" class="mm-link">What We Do</a>
+    <a href="#events" class="mm-link">Events</a>
+    <a href="#tournament" class="mm-link">1v1 Tournament</a>
+    <a href="#about" class="mm-link">About</a>
+    <!-- REGISTER LINK (mobile) — replace href="#" -->
+    <a href="#" class="btn btn-primary mm-link">Register for Next Event</a>
+  </div>
+
+  <!-- =========================================================
+       HERO
+  ========================================================== -->
+  <section class="hero" id="hero">
+    <div class="container hero-content">
+      <span class="eyebrow">Local Sports · Real Community</span>
+      <h1 class="display">Connect. Play.<br><span class="hl">Dominate.</span></h1>
+      <p class="sub">The ultimate hub for sports lovers. Find your next game.</p>
+      <div class="hero-actions">
+        <!-- MAIN CTA — replace href="#" with your external registration link -->
+        <a href="#" class="btn btn-primary">Register for Next Event <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="#what-we-do" class="btn btn-ghost">Explore <i class="fa-solid fa-chevron-down"></i></a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <span class="line"></span>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SOLID CONTENT (scrolls over the fixed video)
+  ========================================================== -->
+  <main class="content">
+
+    <!-- WHAT WE DO -->
+    <section class="section" id="what-we-do">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">What We Do</span>
+          <h2 class="display">More Than A Game</h2>
+          <p>We handle everything so you can focus on what matters — the play. From the first whistle to the final highlight reel.</p>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature reveal">
+            <span class="num">01</span>
+            <div class="icon"><i class="fa-solid fa-bullhorn"></i></div>
+            <h3>Organize Events</h3>
+            <p>We set up the pitch, the refs, and the gear. Turn up and play — the logistics are handled.</p>
+          </div>
+          <div class="feature reveal">
+            <span class="num">02</span>
+            <div class="icon"><i class="fa-solid fa-people-group"></i></div>
+            <h3>Connect Players</h3>
+            <p>Bringing local athletes together. Build your squad, meet rivals, and grow the community.</p>
+          </div>
+          <div class="feature reveal">
+            <span class="num">03</span>
+            <div class="icon"><i class="fa-solid fa-camera-retro"></i></div>
+            <h3>Capture the Moment</h3>
+            <p>High-quality media and portfolios of every game. Relive your best plays in cinematic detail.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1v1 TOURNAMENT -->
+    <section class="section tournament" id="tournament">
+      <div class="vs-watermark">VS</div>
+      <div class="container tournament-inner reveal">
+        <span class="badge"><span class="dot"></span> Coming Soon</span>
+        <h2 class="display">The Ultimate <span class="hl">1vs1</span> Showdown</h2>
+        <p>Think you have what it takes to beat the best? Our exclusive 1vs1 tournament is dropping soon. High stakes, pure skill.</p>
+        <!-- WAITLIST CTA — replace href="#" -->
+        <a href="#" class="btn btn-primary">Join the Waitlist <i class="fa-solid fa-bolt"></i></a>
+      </div>
+    </section>
+
+    <!-- EVENTS — UPCOMING -->
+    <section class="section" id="events">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Upcoming Events</span>
+          <h2 class="display">Get In The Game</h2>
+          <p>Lock in your spot. Limited slots, maximum intensity — register before the whistle blows.</p>
+        </div>
+
+        <div class="event-grid">
+          <!-- EVENT CARD 1 -->
+          <article class="event-card reveal">
+            <div class="event-media">
+              <span class="tag">5-a-side</span>
+              <img src="https://images.unsplash.com/photo-1762013315117-1c8005ad2b41?auto=format&fit=crop&w=900&q=75" alt="Night Football League" loading="lazy" />
+            </div>
+            <div class="event-body">
+              <h3>Night Lights League</h3>
+              <div class="event-meta">
+                <span><i class="fa-regular fa-calendar"></i> Sat, 12 July 2025 · 19:00</span>
+                <span><i class="fa-solid fa-location-dot"></i> Warsaw Arena, Poland</span>
+              </div>
+              <!-- REGISTER NOW — replace href="#" -->
+              <a href="#" class="btn btn-primary">Register Now <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </article>
+
+          <!-- EVENT CARD 2 -->
+          <article class="event-card reveal">
+            <div class="event-media">
+              <span class="tag">Street</span>
+              <img src="https://images.pexels.com/photos/12253473/pexels-photo-12253473.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Street Football Cup" loading="lazy" />
+            </div>
+            <div class="event-body">
+              <h3>Street Kings Cup</h3>
+              <div class="event-meta">
+                <span><i class="fa-regular fa-calendar"></i> Sun, 27 July 2025 · 14:00</span>
+                <span><i class="fa-solid fa-location-dot"></i> Kraków Old Town Courts</span>
+              </div>
+              <!-- REGISTER NOW — replace href="#" -->
+              <a href="#" class="btn btn-primary">Register Now <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </article>
+
+          <!-- EVENT CARD 3 -->
+          <article class="event-card reveal">
+            <div class="event-media">
+              <span class="tag">Hoops</span>
+              <img src="https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?auto=format&fit=crop&w=900&q=75" alt="Basketball Showcase" loading="lazy" />
+            </div>
+            <div class="event-body">
+              <h3>Hardwood Showcase</h3>
+              <div class="event-meta">
+                <span><i class="fa-regular fa-calendar"></i> Sat, 09 Aug 2025 · 17:30</span>
+                <span><i class="fa-solid fa-location-dot"></i> Gdańsk Sports Hall</span>
+              </div>
+              <!-- REGISTER NOW — replace href="#" -->
+              <a href="#" class="btn btn-primary">Register Now <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAST EVENTS — MASONRY GALLERY -->
+    <section class="section" id="legacy" style="padding-top:0;">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Legacy</span>
+          <h2 class="display">Past Events</h2>
+          <p>The moments that built BallersPlay. Sweat, skill, and unforgettable nights on the pitch.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="reveal">
+            <img src="https://images.unsplash.com/photo-1776065636845-65e402c2decb?auto=format&fit=crop&w=800&q=75" alt="Players on the field at night" loading="lazy" />
+            <figcaption>Midnight Derby · Warsaw</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img src="https://images.pexels.com/photos/32190714/pexels-photo-32190714.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Intense football battle" loading="lazy" />
+            <figcaption>The Final Whistle · 2024</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img src="https://images.unsplash.com/photo-1584992120020-defa7d36fdfb?auto=format&fit=crop&w=800&q=75" alt="Basketball action" loading="lazy" />
+            <figcaption>Hoops Night · Gdańsk</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img src="https://images.unsplash.com/photo-1773850561705-dacec6d0b16b?auto=format&fit=crop&w=800&q=75" alt="Soccer game in progress" loading="lazy" />
+            <figcaption>Summer Slam · Kraków</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img src="https://images.unsplash.com/photo-1770631070393-fdcf5a751c04?auto=format&fit=crop&w=800&q=75" alt="Street football culture" loading="lazy" />
+            <figcaption>Street Culture · Łódź</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img src="https://images.pexels.com/photos/31847342/pexels-photo-31847342.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Stadium atmosphere" loading="lazy" />
+            <figcaption>Full House · Poznań</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section about" id="about">
+      <div class="container about-grid">
+        <div class="reveal">
+          <span class="eyebrow">About Us</span>
+          <h2 class="display">Born on the Pitch.</h2>
+          <p>Based in Poland, BallersPlay was created by athletes, for athletes. We believe sports are better together, and we're on a mission to build the strongest local sports community by hosting premium, highly competitive, and casual events.</p>
+          <div class="about-stats">
+            <div class="stat"><div class="n">50+</div><div class="l">Events Hosted</div></div>
+            <div class="stat"><div class="n">2K+</div><div class="l">Players Connected</div></div>
+            <div class="stat"><div class="n">12</div><div class="l">Cities</div></div>
+          </div>
+        </div>
+        <div class="about-media reveal">
+          <img src="https://images.pexels.com/photos/32190714/pexels-photo-32190714.jpeg?auto=compress&cs=tinysrgb&w=900" alt="BallersPlay community" loading="lazy" />
+          <div class="flag"><i class="fa-solid fa-location-dot" style="color:var(--accent)"></i> Made in Poland</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#hero" class="logo">
+            <img src="LogoEnhanced2.png" alt="BallersPlay" style="height:46px;"
+                 onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='inline';" />
+            <span class="logo-text" id="footerLogoFallback" style="display:none;">BALLERS<span>PLAY</span></span>
+          </a>
+          <p>Organizing, hosting, and showcasing local sports events. Connect with players, find your next game, and dominate.</p>
+          <div class="socials">
+            <!-- SOCIAL LINKS — replace href="#" -->
+            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <a href="#what-we-do">What We Do</a>
+          <a href="#events">Events</a>
+          <a href="#tournament">1v1 Tournament</a>
+          <a href="#about">About</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Get In Touch</h4>
+          <a href="mailto:info@ballersplay.com">info@ballersplay.com</a>
+          <span>Poland</span>
+          <!-- REGISTER LINK (footer) — replace href="#" -->
+          <a href="#">Register for an Event</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> BallersPlay. All rights reserved.</span>
+        <span>Built for ballers · <a href="mailto:info@ballersplay.com">info@ballersplay.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       VANILLA JAVASCRIPT
+  ========================================================== -->
+  <script>
+    // 1) Navbar: transparent -> solid on scroll
+    const navbar = document.getElementById('navbar');
+    const onScroll = () => {
+      if (window.scrollY > 40) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // 2) Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileClose = document.getElementById('mobileClose');
+    const closeMenu = () => mobileMenu.classList.remove('open');
+    burger.addEventListener('click', () => mobileMenu.classList.add('open'));
+    mobileClose.addEventListener('click', closeMenu);
+    document.querySelectorAll('.mm-link').forEach(a => a.addEventListener('click', closeMenu));
+
+    // 3) Scroll reveal animations
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          entry.target.style.transitionDelay = (i % 3) * 80 + 'ms';
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // 4) Dynamic year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
