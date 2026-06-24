@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "@/App.css";
 
+
 const REGISTER_URL = "https://tally.so/r/rjgQ9v";
 const INSTAGRAM_URL =
   "https://www.instagram.com/ballers.play?igsh=MXg4MnR2cDdhZWhh&utm_source=qr";
