@@ -3,6 +3,7 @@ import "@/App.css";
 
 
 const REGISTER_URL = "https://tally.so/r/rjgQ9v";
+const ORGANIZER_URL = "https://tally.so/r/Y5Eyaz";
 const INSTAGRAM_URL =
   "https://www.instagram.com/ballers.play?igsh=MXg4MnR2cDdhZWhh&utm_source=qr";
 const CONTACT_EMAIL = "ballerplay.2024@gmail.com";
@@ -91,13 +92,13 @@ export default function App() {
           <nav className="nav-links">
             <a href="#what-we-do" data-testid="nav-link-what-we-do">What We Do</a>
             <a href="#events" data-testid="nav-link-events">Events</a>
-            <a href="#tournament" data-testid="nav-link-tournament">1v1 Tournament</a>
+            <a href="#organizers" data-testid="nav-link-tournament">Organize a Game</a>
             <a href="#about" data-testid="nav-link-about">About</a>
           </nav>
 
           <div className="nav-cta">
             <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="nav-register-btn">
-              Register <i className="fa-solid fa-arrow-right"></i>
+              Find a Game <i className="fa-solid fa-arrow-right"></i>
             </a>
             <button className="burger" aria-label="Open menu" onClick={() => setMenuOpen(true)} data-testid="burger-btn">
               <i className="fa-solid fa-bars"></i>
@@ -113,24 +114,24 @@ export default function App() {
         </button>
         <a href="#what-we-do" onClick={closeMenu}>What We Do</a>
         <a href="#events" onClick={closeMenu}>Events</a>
-        <a href="#tournament" onClick={closeMenu}>1v1 Tournament</a>
+        <a href="#organizers" onClick={closeMenu}>Organize a Game</a>
         <a href="#about" onClick={closeMenu}>About</a>
         <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" onClick={closeMenu}>
-          Register for Next Event
+          Find a Game
         </a>
       </div>
 
       {/* HERO */}
       <section className="hero" id="hero">
         <div className="container hero-content">
-          <span className="eyebrow">Local Sports · Real Community</span>
+          <span className="eyebrow">Wrocław Football · Real Community</span>
           <h1 className="display">
-            Connect. Play.<br /><span className="hl">Dominate.</span>
+            Find Your Next<br /><span className="hl">Football Game.</span>
           </h1>
-          <p className="sub">The ultimate hub for sports lovers. Find your next game.</p>
+          <p className="sub">Find football games in Wrocław, or get help filling spots in matches you organize.</p>
           <div className="hero-actions">
             <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="hero-register-btn">
-              Register for Next Event <i className="fa-solid fa-arrow-right"></i>
+              Find a Game <i className="fa-solid fa-arrow-right"></i>
             </a>
             <a href="#what-we-do" className="btn btn-ghost">
               Explore <i className="fa-solid fa-chevron-down"></i>
@@ -151,15 +152,15 @@ export default function App() {
             <div className="section-head reveal">
               <span className="eyebrow">What We Do</span>
               <h2 className="display">More Than A Game</h2>
-              <p>We handle everything so you can focus on what matters — the play. From the first whistle to the final highlight reel.</p>
+              <p>Connect with football players and organizers in Wrocław.</p>
             </div>
 
             <div className="feature-grid">
               <div className="feature reveal">
                 <span className="num">01</span>
                 <div className="icon"><i className="fa-solid fa-bullhorn"></i></div>
-                <h3>Organize Events</h3>
-                <p>We set up the pitch, the refs, and the gear. Turn up and play — the logistics are handled.</p>
+                <h3>Support Organizers</h3>
+                <p>Submit your football match and request help finding available players.</p>
               </div>
               <div className="feature reveal">
                 <span className="num">02</span>
@@ -170,178 +171,22 @@ export default function App() {
               <div className="feature reveal">
                 <span className="num">03</span>
                 <div className="icon"><i className="fa-solid fa-camera-retro"></i></div>
-                <h3>Capture the Moment</h3>
-                <p>High-quality media and portfolios of every game. Relive your best plays in cinematic detail.</p>
+                <h3>Confirm Your Spot</h3>
+                <p>Player requests are reviewed and confirmed before joining a match.</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* SPORTS WE COVER */}
-        <section className="section" id="sports" style={{ paddingTop: 0 }}>
-          <div className="container">
-            <div className="section-head reveal">
-              <span className="eyebrow">Sports We Cover</span>
-              <h2 className="display">Pick Your Arena</h2>
-              <p>From the baseline to the net — BallersPlay runs premium, competitive events across more than just the pitch.</p>
-            </div>
-
-            <div className="sports-grid">
-              <div className="sport-card reveal">
-                <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=800&q=75" alt="Tennis" loading="lazy" />
-                <div className="sport-info">
-                  <div className="s-icon"><i className="fa-solid fa-table-tennis-paddle-ball"></i></div>
-                  <h3>Tennis</h3>
-                  <p>Singles &amp; doubles showdowns on premium courts.</p>
-                </div>
-              </div>
-              <div className="sport-card reveal">
-                <img src="https://images.unsplash.com/photo-1722087642932-9b070e9a066e?auto=format&fit=crop&w=800&q=75" alt="Badminton" loading="lazy" />
-                <div className="sport-info">
-                  <div className="s-icon"><i className="fa-solid fa-feather-pointed"></i></div>
-                  <h3>Badminton</h3>
-                  <p>Fast rallies and high-flying smashes indoors.</p>
-                </div>
-              </div>
-              <div className="sport-card reveal">
-                <img src="https://images.pexels.com/photos/6203501/pexels-photo-6203501.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Volleyball" loading="lazy" />
-                <div className="sport-info">
-                  <div className="s-icon"><i className="fa-solid fa-volleyball"></i></div>
-                  <h3>Volleyball</h3>
-                  <p>Team spikes, blocks and pure court energy.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 1v1 TOURNAMENT */}
-        <section className="section tournament" id="tournament">
-          <div className="vs-watermark">VS</div>
-          <div className="container tournament-inner reveal">
-            <span className="badge"><span className="dot"></span> Coming Soon</span>
-            <h2 className="display">The Ultimate <span className="hl">1vs1</span> Showdown</h2>
-            <p>Think you have what it takes to beat the best? Our exclusive 1vs1 tournament is dropping soon. High stakes, pure skill.</p>
-            <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="waitlist-btn">
-              Join the Waitlist <i className="fa-solid fa-bolt"></i>
-            </a>
-          </div>
-        </section>
-
-        {/* EVENTS — UPCOMING */}
-        <section className="section" id="events">
-          <div className="container">
-            <div className="section-head reveal">
-              <span className="eyebrow">Upcoming Events</span>
-              <h2 className="display">Get In The Game</h2>
-              <p>Lock in your spot. Limited slots, maximum intensity — register before the whistle blows.</p>
-            </div>
-
-            <div className="event-grid">
-              <article className="event-card reveal">
-                <div className="event-media">
-                  <span className="tag">5-a-side</span>
-                  <img src="https://images.unsplash.com/photo-1762013315117-1c8005ad2b41?auto=format&fit=crop&w=900&q=75" alt="Night Football League" loading="lazy" />
-                </div>
-                <div className="event-body">
-                  <h3>Night Lights League</h3>
-                  <div className="event-meta">
-                    <span><i className="fa-regular fa-calendar"></i> Coming Soon</span>
-                    <span><i className="fa-solid fa-location-dot"></i> Wrocław, Poland</span>
-                  </div>
-                  <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="event-register-1">
-                    Register Now <i className="fa-solid fa-arrow-right"></i>
-                  </a>
-                </div>
-              </article>
-
-              <article className="event-card reveal">
-                <div className="event-media">
-                  <span className="tag">Street</span>
-                  <img src="https://images.pexels.com/photos/12253473/pexels-photo-12253473.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Street Football Cup" loading="lazy" />
-                </div>
-                <div className="event-body">
-                  <h3>Street Kings Cup</h3>
-                  <div className="event-meta">
-                    <span><i className="fa-regular fa-calendar"></i> Coming Soon</span>
-                    <span><i className="fa-solid fa-location-dot"></i> Wrocław, Poland</span>
-                  </div>
-                  <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="event-register-2">
-                    Register Now <i className="fa-solid fa-arrow-right"></i>
-                  </a>
-                </div>
-              </article>
-
-              <article className="event-card reveal">
-                <div className="event-media">
-                  <span className="tag">Hoops</span>
-                  <img src="https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?auto=format&fit=crop&w=900&q=75" alt="Basketball Showcase" loading="lazy" />
-                </div>
-                <div className="event-body">
-                  <h3>Hardwood Showcase</h3>
-                  <div className="event-meta">
-                    <span><i className="fa-regular fa-calendar"></i> Coming Soon</span>
-                    <span><i className="fa-solid fa-location-dot"></i> Wrocław, Poland</span>
-                  </div>
-                  <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="event-register-3">
-                    Register Now <i className="fa-solid fa-arrow-right"></i>
-                  </a>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        {/* PAST EVENTS — MASONRY GALLERY */}
-        <section className="section" id="legacy" style={{ paddingTop: 0 }}>
-          <div className="container">
-            <div className="section-head reveal">
-              <span className="eyebrow">Legacy</span>
-              <h2 className="display">Past Events</h2>
-              <p>The moments that built BallersPlay. Sweat, skill, and unforgettable nights on the pitch.</p>
-            </div>
-
-            <div className="gallery">
-              <figure className="reveal">
-                <img src="https://images.unsplash.com/photo-1776065636845-65e402c2decb?auto=format&fit=crop&w=800&q=75" alt="Players on the field at night" loading="lazy" />
-                <figcaption>Midnight Derby · Wrocław</figcaption>
-              </figure>
-              <figure className="reveal">
-                <img src="https://images.pexels.com/photos/32190714/pexels-photo-32190714.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Intense football battle" loading="lazy" />
-                <figcaption>The Final Whistle · Wrocław</figcaption>
-              </figure>
-              <figure className="reveal">
-                <img src="https://images.unsplash.com/photo-1584992120020-defa7d36fdfb?auto=format&fit=crop&w=800&q=75" alt="Basketball action" loading="lazy" />
-                <figcaption>Hoops Night · Wrocław</figcaption>
-              </figure>
-              <figure className="reveal">
-                <img src="https://images.unsplash.com/photo-1773850561705-dacec6d0b16b?auto=format&fit=crop&w=800&q=75" alt="Soccer game in progress" loading="lazy" />
-                <figcaption>Summer Slam · Wrocław</figcaption>
-              </figure>
-              <figure className="reveal">
-                <img src="https://images.unsplash.com/photo-1770631070393-fdcf5a751c04?auto=format&fit=crop&w=800&q=75" alt="Street football culture" loading="lazy" />
-                <figcaption>Street Culture · Wrocław</figcaption>
-              </figure>
-              <figure className="reveal">
-                <img src="https://images.pexels.com/photos/31847342/pexels-photo-31847342.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Stadium atmosphere" loading="lazy" />
-                <figcaption>Full House · Wrocław</figcaption>
-              </figure>
-            </div>
-          </div>
-        </section>
-
+        <section className="section" id="organizers"><div className="container"><div className="section-head reveal"><span className="eyebrow">Football in Wrocław</span><h2 className="display">Play Together.</h2><p>BallersPlay helps players find football opportunities and independent organizers fill their matches.</p></div><div className="feature-grid"><article className="feature reveal"><div className="icon"><i className="fa-solid fa-futbol"></i></div><h3>Find a Game</h3><p>Tell us when and where you want to play. We'll reach out about suitable matches. Registration does not guarantee a spot.</p><a className="btn btn-primary" href={REGISTER_URL} target="_blank" rel="noopener noreferrer">Register as a Player</a></article><article className="feature reveal"><div className="icon"><i className="fa-solid fa-calendar-plus"></i></div><h3>Organize a Game</h3><p>Already running a football match? Submit your match details and available spots. We review submissions before publishing matches.</p><a className="btn btn-primary" href={ORGANIZER_URL} target="_blank" rel="noopener noreferrer" data-testid="organizer-submit-btn">Submit Your Match</a></article></div></div></section><section className="section tournament" id="events"><div className="container tournament-inner reveal"><span className="badge">Wrocław Pilot</span><h2 className="display">Get In The <span className="hl">Game.</span></h2><p>Join the local football community. We confirm match availability with organizers before confirming player spots.</p><a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Join as a Player</a> <a href={ORGANIZER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Organize a Match</a></div></section>
         {/* ABOUT */}
         <section className="section about" id="about">
           <div className="container about-grid">
             <div className="reveal">
               <span className="eyebrow">About Us</span>
               <h2 className="display">Born on the Pitch.</h2>
-              <p>Based in Poland, BallersPlay was created by athletes, for athletes. We believe sports are better together, and we're on a mission to build the strongest local sports community by hosting premium, highly competitive, and casual events.</p>
-              <div className="about-stats">
-                <div className="stat"><div className="n">10+</div><div className="l">Events Hosted</div></div>
-                <div className="stat"><div className="n">500+</div><div className="l">Players Connected</div></div>
-                <div className="stat"><div className="n">1</div><div className="l">City</div></div>
-              </div>
+              <p>BallersPlay connects recreational football players and independent match organizers in Wrocław. We are starting with a hands-on pilot and building from real community feedback.</p>
+              
             </div>
             <div className="about-media reveal">
               <img src="https://images.pexels.com/photos/32190714/pexels-photo-32190714.jpeg?auto=compress&cs=tinysrgb&w=900" alt="BallersPlay community" loading="lazy" />
@@ -359,12 +204,12 @@ export default function App() {
               <a href="#hero" className="logo">
                 <LogoMark imgStyle={{ height: "46px" }} fallbackId="footerLogoFallback" />
               </a>
-              <p>Organizing, hosting, and showcasing local sports events. Connect with players, find your next game, and dominate.</p>
+              <p>Helping football players find games and organizers fill available spots in Wrocław.</p>
               <div className="socials">
                 <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Instagram" data-testid="instagram-link">
                   <i className="fa-brands fa-instagram"></i>
                 </a>
-                <a href="#" aria-label="TikTok"><i className="fa-brands fa-tiktok"></i></a>
+                
               </div>
             </div>
 
@@ -372,7 +217,7 @@ export default function App() {
               <h4>Explore</h4>
               <a href="#what-we-do">What We Do</a>
               <a href="#events">Events</a>
-              <a href="#tournament">1v1 Tournament</a>
+              <a href="#organizers">Organize a Game</a>
               <a href="#about">About</a>
             </div>
 
