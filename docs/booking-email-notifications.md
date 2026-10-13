@@ -21,3 +21,32 @@ This branch adds an email outbox trigger for booking status changes and a server
 - Email provider API call uses a stable idempotency key; verify provider behavior before launch.
 - Consider retention/deletion of email addresses and payloads under applicable privacy requirements.
 - Review rate limits and edge function security before enabling production delivery.
+
+
+## Deployment continuation (13 October)
+1. Run `supabase/migrations/20261013030000_booking_email_delivery_leases.sql` after the outbox migration.
+2. Redeploy the latest `send-booking-emails/index.ts` from this branch. Keep JWT verification enabled.
+3. Ensure `BOOKING_EMAIL_TEST_RECIPIENT` equals the verified Resend inbox. The function only claims rows addressed to that inbox. Non-test recipients remain queued and must be handled under an explicit retention policy.
+4. Store the **legacy Supabase service_role JWT** securely in Supabase Vault via the Secrets UI, not as a literal in SQL history. Do not use the Resend key, publishable key, or new sb_secret_ key for a JWT-verified function.
+5. For scheduling, create a SQL Snippet Cron job after configuring the Vault secret named `ballersplay_cron_service_role`. Use a reviewed SQL statement of the form:
+
+```sql
+select net.http_post(
+  url := 'https://dbrsgwdlicajlbtbpylj.supabase.co/functions/v1/send-booking-emails',
+  headers := jsonb_build_object(
+    'Content-Type','application/json',
+    'Authorization','Bearer ' || (
+      select decrypted_secret from vault.decrypted_secrets
+      where name='ballersplay_cron_service_role' limit 1
+    )
+  ),
+  body := '{}'::jsonb,
+  timeout_milliseconds := 30000
+);
+```
+
+Use schedule `* * * * *` only after manual end-to-end verification. Cron job SQL contains only a Vault lookup, never a literal secret.
+6. Review Cron run history, Edge Function logs, Resend delivery logs, and `booking_email_outbox` after testing.
+
+## Delivery semantics
+Atomic `FOR UPDATE SKIP LOCKED` claims prevent simultaneous workers from claiming the same pending row. Leases expire after three minutes; retry backoff is bounded, with a maximum of five attempts. Resend's idempotency header reduces duplicates, but cannot guarantee exactly-once delivery in all failure cases. Review delivery monitoring before public launch.
