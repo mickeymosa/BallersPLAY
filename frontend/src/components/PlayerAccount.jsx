@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
+const AVATARS = {striker:"⚽",keeper:"🧤",captain:"🏆",playmaker:"🎯",defender:"🛡️",speedster:"⚡"};
 const validPhone = (value) => /^\+[1-9]\d{7,14}$/.test(value);
 
 export default function PlayerAccount() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [stats, setStats] = useState(null);
+  const [avatarBusy, setAvatarBusy] = useState(false);
   const [usernameInput, setUsernameInput] = useState("");
   const [searchUsername, setSearchUsername] = useState("");
   const [foundPlayer, setFoundPlayer] = useState(null);
@@ -26,9 +29,36 @@ export default function PlayerAccount() {
   useEffect(() => {
     if (!user || !supabase) { setProfile(null); setProfileLoading(false); return; }
     setProfileLoading(true);
-    supabase.from("player_profiles").select("full_name,phone,username").eq("id",user.id).maybeSingle()
-      .then(({data,error}) => { setProfileLoading(false); if (!error) { setProfile(data); setUsernameInput(data?.username || ""); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
+    supabase.from("player_profiles").select("full_name,phone,username,avatar_key,avatar_path,is_verified").eq("id",user.id).maybeSingle()
+      .then(({data,error}) => { setProfileLoading(false); if (error) setNotice("Could not load your profile: "+error.message); if (!error) { setProfile(data); setUsernameInput(data?.username || ""); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
   }, [user]);
+  useEffect(() => {
+    if (!user || !profile) {setStats(null);return;}
+    supabase.rpc("ballersplay_profile_stats",{p_player_id:user.id}).then(({data})=>setStats(data?.[0]||null));
+  }, [user,profile]);
+  async function selectAvatar(key) {
+    if (!profile) return;
+    setAvatarBusy(true);setNotice("");
+    const {error}=await supabase.from("player_profiles").update({avatar_key:key,avatar_path:null,updated_at:new Date().toISOString()}).eq("id",user.id);
+    if (error) setNotice(error.message);
+    else setProfile(p=>({...p,avatar_key:key,avatar_path:null}));
+    setAvatarBusy(false);
+  }
+  async function uploadAvatar(event) {
+    const file=event.target.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size>2*1024*1024) return setNotice("Choose a JPG, PNG or WebP image under 2 MB.");
+    setAvatarBusy(true);setNotice("");
+    const ext={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"}[file.type];
+    const path=user.id+"/avatar-"+crypto.randomUUID()+"."+ext;
+    const {error}=await supabase.storage.from("player-avatars").upload(path,file,{contentType:file.type,upsert:false});
+    if (error) {setNotice(error.message);setAvatarBusy(false);return;}
+    const result=await supabase.from("player_profiles").update({avatar_path:path,updated_at:new Date().toISOString()}).eq("id",user.id);
+    if(result.error) setNotice(result.error.message);
+    else setProfile(p=>({...p,avatar_path:path}));
+    setAvatarBusy(false);
+  }
+  const avatarUrl=profile?.avatar_path ? supabase?.storage.from("player-avatars").getPublicUrl(profile.avatar_path).data.publicUrl : null;
   const update = (key, value) => setForm(prev => ({...prev,[key]:value}));
   async function submit(event) {
     event.preventDefault();
@@ -128,6 +158,21 @@ export default function PlayerAccount() {
         <button disabled={busy}>Save profile</button>
       </form>}
     {profile && <div className="bp-profile-features">
+      <div className="bp-profile-hero">
+        <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile avatar"/>:<span>{AVATARS[profile.avatar_key]||"⚽"}</span>}</div>
+        <div><h2>{profile.full_name}</h2><p>{profile.username?"@"+profile.username:"Choose a username below"}</p>
+        <p>{profile.is_verified?"✓ Verified by BallersPlay":"Account not yet verified"}</p></div>
+      </div>
+      <div className="bp-stat-grid">
+        <div><strong>{stats?.games_played??"—"}</strong><span>Games played</span></div>
+        <div><strong>{stats?.matches_organized??"—"}</strong><span>Matches organized</span></div>
+        <div><strong>{stats?.average_rating??"—"}</strong><span>Player rating</span></div>
+        <div><strong>{stats?.review_count??"—"}</strong><span>Reviews</span></div>
+      </div>
+      <p className="bp-fineprint">Counts reflect confirmed bookings in completed matches and completed matches linked to your organizer account. Reviews are only accepted between confirmed participants in a completed match.</p>
+      <h2>Choose your football avatar</h2>
+      <div className="bp-avatar-choices">{Object.entries(AVATARS).map(([key,emoji])=><button type="button" key={key} disabled={avatarBusy} className={profile.avatar_key===key&&!profile.avatar_path?"selected":""} onClick={()=>selectAvatar(key)} title={key} aria-label={"Use "+key+" avatar"}>{emoji}</button>)}</div>
+      <label className="bp-upload-label">Or upload your own profile photo (JPG, PNG or WebP, max 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={uploadAvatar}/></label>
       <h2>Player profile</h2>
       <p>Your username is your public identity. Other players can use it to find you later.</p>
       <form className="bp-native-form" onSubmit={updateUsername}>
