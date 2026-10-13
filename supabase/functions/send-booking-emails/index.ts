@@ -5,7 +5,18 @@ Deno.serve(async (req) => {
  if(req.method!=="POST") return new Response("Method not allowed",{status:405});
  const bearer=req.headers.get("authorization")||"";
  const secret=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
- if(!secret || bearer!==`Bearer ${secret}`) return new Response("Unauthorized",{status:401});
+ // Supabase's Edge gateway validates the bearer JWT before this function runs.
+ // The legacy JWT in Vault may differ from the service-role key exposed to the runtime.
+ // Require a gateway-verified service_role JWT instead of comparing key strings.
+ let role: string | undefined;
+ try {
+   const token = bearer.match(/^Bearer\\s+([^\\s]+)$/i)?.[1];
+   const payload = token?.split(".")[1];
+   if (payload && token?.split(".").length === 3) {
+     role = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))).role;
+   }
+ } catch { /* malformed token */ }
+ if (!secret || role !== "service_role") return new Response("Unauthorized",{status:401});
  const apiKey=Deno.env.get("RESEND_API_KEY"),from=Deno.env.get("BOOKING_EMAIL_FROM");
  if(!apiKey||!from) return new Response("Email service not configured",{status:503});
  // While using Resend's test sender, restrict delivery to the account's verified inbox.
