@@ -9,6 +9,10 @@ export default function PlayerAccount() {
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [stats, setStats] = useState(null);
+  const [candidates,setCandidates]=useState([]);
+  const [reviewTarget,setReviewTarget]=useState("");
+  const [rating,setRating]=useState("5");
+  const [reviewComment,setReviewComment]=useState("");
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [usernameInput, setUsernameInput] = useState("");
   const [searchUsername, setSearchUsername] = useState("");
@@ -35,7 +39,21 @@ export default function PlayerAccount() {
   useEffect(() => {
     if (!user || !profile) {setStats(null);return;}
     supabase.rpc("ballersplay_profile_stats",{p_player_id:user.id}).then(({data})=>setStats(data?.[0]||null));
+    supabase.rpc("ballersplay_review_candidates").then(({data})=>setCandidates(data||[]));
   }, [user,profile]);
+  async function submitReview(event) {
+    event.preventDefault();
+    const target=candidates.find(c=>c.match_id+":"+c.player_id===reviewTarget);
+    if(!target)return setNotice("Choose a teammate from a completed match.");
+    setBusy(true);setNotice("");
+    const {error}=await supabase.rpc("ballersplay_submit_review",{p_match_id:target.match_id,p_reviewed_id:target.player_id,p_rating:Number(rating),p_comment:reviewComment.trim()});
+    if(error)setNotice(error.message);
+    else {
+      setCandidates(list=>list.filter(c=>c.match_id+":"+c.player_id!==reviewTarget));
+      setReviewTarget("");setReviewComment("");setNotice("Review submitted. Thank you!");
+    }
+    setBusy(false);
+  }
   async function selectAvatar(key) {
     if (!profile) return;
     setAvatarBusy(true);setNotice("");
@@ -170,6 +188,16 @@ export default function PlayerAccount() {
         <div><strong>{stats?.review_count??"—"}</strong><span>Reviews</span></div>
       </div>
       <p className="bp-fineprint">Counts reflect confirmed bookings in completed matches and completed matches linked to your organizer account. Reviews are only accepted between confirmed participants in a completed match.</p>
+      <h2>Review a teammate</h2>
+      {candidates.length ? <form className="bp-native-form" onSubmit={submitReview}>
+        <label>Player and completed match<select required value={reviewTarget} onChange={e=>setReviewTarget(e.target.value)}>
+          <option value="">Choose a teammate</option>
+          {candidates.map(c=><option key={c.match_id+":"+c.player_id} value={c.match_id+":"+c.player_id}>{c.player_name} ({c.match_title})</option>)}
+        </select></label>
+        <label>Rating<select value={rating} onChange={e=>setRating(e.target.value)}>{[5,4,3,2,1].map(n=><option key={n} value={n}>{n} / 5</option>)}</select></label>
+        <label>Comment (optional)<textarea maxLength={500} rows={3} value={reviewComment} onChange={e=>setReviewComment(e.target.value)}/></label>
+        <button disabled={busy}>Submit review</button>
+      </form> : <p>You can review teammates after a match is marked completed and both players have confirmed bookings.</p>}
       <h2>Choose your football avatar</h2>
       <div className="bp-avatar-choices">{Object.entries(AVATARS).map(([key,emoji])=><button type="button" key={key} disabled={avatarBusy} className={profile.avatar_key===key&&!profile.avatar_path?"selected":""} onClick={()=>selectAvatar(key)} title={key} aria-label={"Use "+key+" avatar"}>{emoji}</button>)}</div>
       <label className="bp-upload-label">Or upload your own profile photo (JPG, PNG or WebP, max 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={uploadAvatar}/></label>
