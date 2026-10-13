@@ -74,13 +74,13 @@ export default function App() {
 
   const page = window.location.pathname.replace(/\/$/, "") || "/";
   if (page === "/admin") return <AdminDashboard />;
-  if (page === "/matches" || page === "/organize" || page === "/account") return (
+  if (page === "/matches" || page === "/organize" || page === "/account" || page === "/profile") return (
     <div className="bp bp-inner-page">
       <header className="bp-inner-header"><div className="container bp-inner-nav">
         <a href="/" className="logo"><LogoMark fallbackId="innerLogoFallback" /></a>
         <nav><a href="/">Home</a><a href="/matches">Find Matches</a><a href="/organize">Organize a Match</a><AccountNav /></nav>
       </div></header>
-      <main>{page === "/matches" ? <MatchDiscovery /> : page === "/account" ? <PlayerAccount /> : <OrganizerSubmission />}</main>
+      <main>{page === "/matches" ? <MatchDiscovery /> : (page === "/account" || page === "/profile") ? <PlayerAccount /> : <OrganizerSubmission />}</main>
       <footer className="bp-inner-footer"><div className="container">BallersPlay · Wrocław football community</div></footer>
     </div>
   );
