@@ -50,6 +50,13 @@ export default function AdminDashboard() {
     setPassword("");
     setBusy(false);
   }
+  async function confirmBooking(id) {
+    setBusy(true);setMessage("");
+    const {error}=await supabase.rpc("ballersplay_confirm_booking",{p_booking_id:id});
+    if(error)setMessage(error.message);
+    else setBookings(prev=>prev.map(b=>b.id===id?{...b,status:"confirmed"}:b));
+    setBusy(false);
+  }
   async function changeBookingStatus(id,status) {
     setBusy(true);setMessage("");
     const {error}=await supabase.from("bookings").update({status}).eq("id",id);
@@ -85,9 +92,10 @@ export default function AdminDashboard() {
                 {m.status === "published" && <button disabled={busy} onClick={()=>changeMatchStatus(m.id,"cancelled")}>Cancel</button>}
               </article>)}</div>}
             <h2>Booking requests ({bookings.length})</h2>
-            <p>Booking approvals will be enabled after capacity and payment-state validation is implemented.</p>
+            <p>Confirmation checks capacity in the database. Payments are handled directly with the organizer.</p>
             {bookings.map(b=><article key={b.id}>
               <strong>{b.player_name || "Player"}</strong><p>{b.player_email} · {b.status}</p>
+              {(b.status==="requested"||b.status==="waitlisted")&&<button disabled={busy} onClick={()=>confirmBooking(b.id)}>Confirm spot</button>}
               {b.status==="requested"&&<><button disabled={busy} onClick={()=>changeBookingStatus(b.id,"waitlisted")}>Waitlist</button><button disabled={busy} onClick={()=>changeBookingStatus(b.id,"rejected")}>Reject</button></>}
               {b.status==="confirmed"&&<button disabled={busy} onClick={()=>changeBookingStatus(b.id,"cancelled")}>Cancel</button>}
             </article>)}
