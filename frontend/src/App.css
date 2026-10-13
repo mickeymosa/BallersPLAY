@@ -732,3 +732,7 @@ header.nav.scrolled {
 .bp-account-nav-link {margin-right:14px;color:#c6ff00!important;font-weight:700}
 .bp-booking-dialog a {color:#a4d800;text-decoration:underline}
 @media(max-width:700px){.bp-account-panel{padding:24px;margin:40px auto}.bp-account-nav-link{display:none}}
+
+.bp-google-signin {margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.16)}
+.bp-google-signin button {width:100%;padding:13px 18px;border:1px solid #777;border-radius:8px;background:#fff;color:#1f1f1f;font-weight:800;cursor:pointer}
+.bp-google-signin button:hover {background:#eee}
