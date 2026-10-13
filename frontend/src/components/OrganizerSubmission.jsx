@@ -8,7 +8,16 @@ export default function OrganizerSubmission(){
     e.preventDefault();if(!supabase)return;
     setState("sending");setMessage("");
     const {data,error}=await supabase.functions.invoke("submit-match",{body:{...form,starts_at:new Date(form.starts_at).toISOString()}});
-    if(error||!data?.ok){setState("error");setMessage(data?.error||"Unable to submit. Please try again.");return;}
+    if(error||!data?.ok){
+      let detail=data?.error;
+      const status=error?.context?.status;
+      if(!detail&&error?.context?.json){try{detail=(await error.context.json())?.error;}catch(_){}}
+      if(!detail&&status===401) detail="Authorization failed (401). Check Edge Function JWT verification.";
+      if(!detail&&status===403) detail="Origin not allowed (403). Check ALLOWED_ORIGINS in Supabase.";
+      if(!detail&&status) detail="Submission failed (HTTP "+status+"). Check Supabase function logs.";
+      if(!detail) detail="Network or CORS error. Check ALLOWED_ORIGINS and browser Network tab.";
+      setState("error");setMessage(detail);return;
+    }
     setState("success");setMessage("Match submitted for review. We will contact you after verification.");setForm(initial);
   }
   return <section id="submit-match" className="bp-form-section"><div className="container bp-form-wrap">
