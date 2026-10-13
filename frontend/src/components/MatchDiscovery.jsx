@@ -11,7 +11,16 @@ export default function MatchDiscovery() {
   async function requestSpot(e){
     e.preventDefault();setRequestState("sending");setRequestMessage("");
     const {data,error}=await supabase.functions.invoke("request-spot",{body:{...player,match_id:selected.id}});
-    if(error||!data?.ok){setRequestState("error");setRequestMessage(data?.error||"Unable to submit.");return;}
+    if(error||!data?.ok){
+      let detail=data?.error;
+      const status=error?.context?.status;
+      if(!detail&&error?.context?.json){try{detail=(await error.context.json())?.error;}catch(_){}}
+      if(!detail&&status===401) detail="Authorization failed (401). Check request-spot JWT verification.";
+      if(!detail&&status===403) detail="Origin not allowed (403). Check ALLOWED_ORIGINS.";
+      if(!detail&&status) detail="Booking failed (HTTP "+status+"). Check request-spot function logs.";
+      if(!detail) detail="Network or CORS error. Check ALLOWED_ORIGINS and browser Network tab.";
+      setRequestState("error");setRequestMessage(detail);return;
+    }
     setRequestState("success");setRequestMessage("Request sent. Your spot is not confirmed yet.");
   }
 
