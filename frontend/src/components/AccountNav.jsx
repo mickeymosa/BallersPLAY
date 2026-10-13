@@ -25,7 +25,7 @@ export default function AccountNav() {
   }
 
   return <span className="bp-account-nav">
-    <a href="/account" className="bp-profile-link">{!ready ? "Account" : user ? "My Profile" : "Log in / Sign up"}</a>
+    <a href="/profile" className="bp-profile-link">{!ready ? "Account" : user ? "My Profile" : "Log in / Sign up"}</a>
     {user && <button type="button" onClick={signOut}>Sign out</button>}
   </span>;
 }
