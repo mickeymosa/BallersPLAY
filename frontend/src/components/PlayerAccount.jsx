@@ -7,13 +7,14 @@ export default function PlayerAccount() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [mode, setMode] = useState("signup");
+  const [recovery, setRecovery] = useState(false);
   const [form, setForm] = useState({ full_name: "", phone: "", email: "", password: "", confirm: "" });
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   useEffect(() => {
     if (!supabase) return;
     supabase.auth.getUser().then(({data}) => setUser(data.user || null));
-    const {data:{subscription}} = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user || null));
+    const {data:{subscription}} = supabase.auth.onAuthStateChange((event, session) => { if (event === "PASSWORD_RECOVERY") setRecovery(true); setUser(session?.user || null); });
     return () => subscription.unsubscribe();
   }, []);
   useEffect(() => {
@@ -52,6 +53,21 @@ export default function PlayerAccount() {
     } catch (error) {setNotice(error.message || "Something went wrong.");}
     finally {setBusy(false);}
   }
+  async function changePassword(event) {
+    event.preventDefault();
+    if (form.password.length < 8 || form.password !== form.confirm) return setNotice("Password must be at least 8 characters and both entries must match.");
+    setBusy(true);
+    const {error} = await supabase.auth.updateUser({password:form.password});
+    setBusy(false);
+    if (error) setNotice(error.message);
+    else {setRecovery(false);setNotice("Password updated.");}
+  }
+  if (recovery) return <section className="bp-account-panel"><h1>Choose a new password</h1>
+    <form className="bp-native-form" onSubmit={changePassword}>
+      <label>New password<input type="password" required minLength={8} autoComplete="new-password" value={form.password} onChange={e=>update("password",e.target.value)}/></label>
+      <label>Confirm password<input type="password" required minLength={8} autoComplete="new-password" value={form.confirm} onChange={e=>update("confirm",e.target.value)}/></label>
+      <button disabled={busy}>Update password</button>{notice && <p role="status">{notice}</p>}
+    </form></section>;
   if (user) return <section className="bp-account-panel">
     <h1>My BallersPlay account</h1><p>Signed in as {user.email}</p>
     {profile ? <p>{profile.full_name} · {profile.phone}</p> : <p>Profile not found. Contact support before booking.</p>}
