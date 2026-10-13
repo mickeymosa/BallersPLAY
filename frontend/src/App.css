@@ -819,3 +819,18 @@ header.nav.scrolled {
 .bp-player-card__progress{font-size:.58rem;font-weight:800;margin-top:7px;letter-spacing:.04em}
 .bp-customizer-preview .bp-player-card{margin:auto;width:min(100%,275px)}
 .bp-customizer-preview .bp-player-card__overall strong{font-size:3rem}
+
+.bp-organizer-match{margin:20px 0;padding:20px;border:1px solid #303d35;border-radius:14px;background:#111b17}
+.bp-organizer-match-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.bp-organizer-match-head span{text-transform:uppercase;color:#c6ff00;font-weight:700;font-size:.75rem}
+.bp-organizer-bookings{display:grid;gap:9px;margin:16px 0}
+.bp-organizer-booking{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px;border:1px solid #35433b;border-radius:10px;background:#17231d}
+.bp-organizer-booking>div:first-child{display:grid;gap:4px}
+.bp-organizer-booking small{color:#b5c3b8;text-transform:capitalize}
+.bp-organizer-actions{display:flex;gap:8px}
+.bp-organizer-actions button,.bp-finish-match{background:#c6ff00;border:0;color:#121900;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer}
+.bp-organizer-actions button:last-child{background:#444e49;color:white}
+.bp-attendance-check{display:flex;align-items:center;gap:8px;font-weight:700}
+.bp-attendance-check input{width:18px;height:18px}
+.bp-finish-match{margin-top:12px}
+.bp-finish-match:disabled{opacity:.45;cursor:not-allowed}
