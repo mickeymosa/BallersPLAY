@@ -7,6 +7,10 @@ export default function PlayerAccount() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [usernameInput, setUsernameInput] = useState("");
+  const [searchUsername, setSearchUsername] = useState("");
+  const [foundPlayer, setFoundPlayer] = useState(null);
+  const [searchNotice, setSearchNotice] = useState("");
   const [mode, setMode] = useState("signup");
   const [recovery, setRecovery] = useState(false);
   const [profileForm, setProfileForm] = useState({full_name:"",phone:""});
@@ -22,8 +26,8 @@ export default function PlayerAccount() {
   useEffect(() => {
     if (!user || !supabase) { setProfile(null); setProfileLoading(false); return; }
     setProfileLoading(true);
-    supabase.from("player_profiles").select("full_name,phone").eq("id",user.id).maybeSingle()
-      .then(({data,error}) => { setProfileLoading(false); if (!error) { setProfile(data); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
+    supabase.from("player_profiles").select("full_name,phone,username").eq("id",user.id).maybeSingle()
+      .then(({data,error}) => { setProfileLoading(false); if (!error) { setProfile(data); setUsernameInput(data?.username || ""); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
   }, [user]);
   const update = (key, value) => setForm(prev => ({...prev,[key]:value}));
   async function submit(event) {
@@ -79,6 +83,26 @@ export default function PlayerAccount() {
     }
     setBusy(false);
   }
+  async function updateUsername(event) {
+    event.preventDefault();
+    const normalized = usernameInput.trim().toLowerCase();
+    if (!/^[a-z][a-z0-9_]{2,19}$/.test(normalized)) return setNotice("Use 3–20 characters: start with a letter, then letters, numbers or underscores.");
+    setBusy(true);setNotice("");
+    const {error} = await supabase.rpc("ballersplay_set_username",{p_username:normalized});
+    if (error) setNotice(error.code==="23505"?"That username is already taken.":error.message);
+    else {setProfile(p=>({...p,username:normalized}));setUsernameInput(normalized);setNotice("Username saved.");}
+    setBusy(false);
+  }
+  async function findPlayer(event) {
+    event.preventDefault();
+    setSearchNotice("");setFoundPlayer(null);
+    const normalized=searchUsername.trim().replace(/^@/,"").toLowerCase();
+    if (!/^[a-z][a-z0-9_]{2,19}$/.test(normalized)) return setSearchNotice("Enter a valid username.");
+    const {data,error}=await supabase.rpc("ballersplay_find_player",{p_username:normalized});
+    if(error) setSearchNotice("Unable to search players right now.");
+    else if (!data?.length) setSearchNotice("No player found with that username.");
+    else setFoundPlayer(data[0]);
+  }
   async function changePassword(event) {
     event.preventDefault();
     if (form.password.length < 8 || form.password !== form.confirm) return setNotice("Password must be at least 8 characters and both entries must match.");
@@ -103,6 +127,27 @@ export default function PlayerAccount() {
         <label>Phone number<input type="tel" required placeholder="+48123456789" pattern="[+][1-9][0-9]{7,14}" value={profileForm.phone} onChange={e=>setProfileForm(p=>({...p,phone:e.target.value}))}/></label>
         <button disabled={busy}>Save profile</button>
       </form>}
+    {profile && <div className="bp-profile-features">
+      <h2>Player profile</h2>
+      <p>Your username is your public identity. Other players can use it to find you later.</p>
+      <form className="bp-native-form" onSubmit={updateUsername}>
+        <label>Choose your username
+          <input required minLength={3} maxLength={20} autoComplete="off" spellCheck={false}
+            pattern="[a-zA-Z][a-zA-Z0-9_]{2,19}" placeholder="moussa10"
+            value={usernameInput} onChange={e=>setUsernameInput(e.target.value)}/>
+        </label>
+        <button disabled={busy}>{profile.username?"Update username":"Save username"}</button>
+      </form>
+      {profile.username && <p className="bp-public-handle">Your handle: @{profile.username}</p>}
+      <h2>Find a player</h2>
+      <p>Search for a player by username. Friend requests and messaging will be added later.</p>
+      <form className="bp-native-form" onSubmit={findPlayer}>
+        <label>Player username<input value={searchUsername} onChange={e=>setSearchUsername(e.target.value)} placeholder="@playername"/></label>
+        <button>Find player</button>
+      </form>
+      {foundPlayer && <p role="status">{foundPlayer.full_name} — @{foundPlayer.username}</p>}
+      {searchNotice && <p role="status">{searchNotice}</p>}
+    </div>}
     {notice && <p role="status">{notice}</p>}
     <div className="bp-account-actions"><a href="/matches" className="btn btn-primary">Find matches</a>
     <button onClick={() => supabase.auth.signOut()}>Sign out</button></div>
