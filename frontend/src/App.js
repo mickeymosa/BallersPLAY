@@ -3,6 +3,7 @@ import "@/App.css";
 import MatchDiscovery from "./components/MatchDiscovery";
 import AdminDashboard from "./components/AdminDashboard";
 import OrganizerSubmission from "./components/OrganizerSubmission";
+import OrganizerDashboard from "./components/OrganizerDashboard";
 import PlayerAccount from "./components/PlayerAccount";
 import AccountNav from "./components/AccountNav";
 
@@ -74,13 +75,13 @@ export default function App() {
 
   const page = window.location.pathname.replace(/\/$/, "") || "/";
   if (page === "/admin") return <AdminDashboard />;
-  if (page === "/matches" || page === "/organize" || page === "/account" || page === "/profile") return (
+  if (page === "/matches" || page === "/organize" || page === "/manage" || page === "/account" || page === "/profile") return (
     <div className="bp bp-inner-page">
       <header className="bp-inner-header"><div className="container bp-inner-nav">
         <a href="/" className="logo"><LogoMark fallbackId="innerLogoFallback" /></a>
-        <nav><a href="/">Home</a><a href="/matches">Find Matches</a><a href="/organize">Organize a Match</a><AccountNav /></nav>
+        <nav><a href="/">Home</a><a href="/matches">Find Matches</a><a href="/organize">Organize a Match</a><a href="/manage">My Matches</a><AccountNav /></nav>
       </div></header>
-      <main>{page === "/matches" ? <MatchDiscovery /> : (page === "/account" || page === "/profile") ? <PlayerAccount /> : <OrganizerSubmission />}</main>
+      <main>{page === "/matches" ? <MatchDiscovery /> : (page === "/account" || page === "/profile") ? <PlayerAccount /> : page === "/manage" ? <OrganizerDashboard /> : <OrganizerSubmission />}</main>
       <footer className="bp-inner-footer"><div className="container">BallersPlay · Wrocław football community</div></footer>
     </div>
   );
@@ -135,6 +136,7 @@ export default function App() {
         <a href="#organizers" onClick={closeMenu}>For Organizers</a>
         <a href="#about" onClick={closeMenu}>About</a>
         <AccountNav />
+        <a href="/manage" onClick={closeMenu}>My Matches</a>
         <a href="/matches" className="btn btn-primary" onClick={closeMenu}>
           Find a Game
         </a>
