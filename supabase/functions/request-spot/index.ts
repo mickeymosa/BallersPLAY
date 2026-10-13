@@ -7,6 +7,21 @@ Deno.serve(async req=>{
   if(!allowed.includes(origin))return respond({error:"Origin not allowed"},403);
   if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{...headers,"Access-Control-Allow-Origin":origin}});
   if(req.method!=="POST")return respond({error:"Method not allowed"},405,origin);
+
+  // Atomic rate limiting runs before parsing or writing public submissions.
+  // Only trust the platform-provided connecting IP; never trust arbitrary forwarded headers.
+  const ip=req.headers.get("cf-connecting-ip") || req.headers.get("x-real-ip");
+  if (!ip) return respond({error:"Submission temporarily unavailable."},503,origin);
+  const secret=Deno.env.get("RATE_LIMIT_HASH_SECRET");
+  if (!secret || secret.length<32) return respond({error:"Submission temporarily unavailable."},503,origin);
+  const encoder=new TextEncoder();
+  const key=await crypto.subtle.importKey("raw",encoder.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  const signature=await crypto.subtle.sign("HMAC",key,encoder.encode(ip));
+  const ipHash=Array.from(new Uint8Array(signature)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  const limitDb=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,{auth:{persistSession:false}});
+  const {data:allowedSubmission,error:limitError}=await limitDb.rpc("ballersplay_check_submission_limit",{p_action:"request-spot",p_ip_hash:ipHash,p_max_attempts:5});
+  if(limitError){console.error("Rate limit check failed",limitError);return respond({error:"Submission temporarily unavailable."},503,origin);}
+  if(!allowedSubmission)return respond({error:"Too many submissions. Please try again in an hour."},429,origin);
   try{
     const input=await req.json();
     if(input.website)return respond({error:"Unable to submit"},400,origin);
