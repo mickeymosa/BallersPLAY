@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import FootballAvatar from "./FootballAvatar";
 
 const AVATARS = {striker:"⚽",keeper:"🧤",captain:"🏆",playmaker:"🎯",defender:"🛡️",speedster:"⚡"};
 const validPhone = (value) => /^\+[1-9]\d{7,14}$/.test(value);
@@ -177,7 +178,7 @@ export default function PlayerAccount() {
       </form>}
     {profile && <div className="bp-profile-features">
       <div className="bp-profile-hero">
-        <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile avatar"/>:<span>{AVATARS[profile.avatar_key]||"⚽"}</span>}</div>
+        <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile avatar"/>:<FootballAvatar variant={profile.avatar_key} size={86}/>}</div>
         <div><h2>{profile.full_name}</h2><p>{profile.username?"@"+profile.username:"Choose a username below"}</p>
         <p>{profile.is_verified?"✓ Verified by BallersPlay":"Account not yet verified"}</p></div>
       </div>
@@ -199,7 +200,7 @@ export default function PlayerAccount() {
         <button disabled={busy}>Submit review</button>
       </form> : <p>You can review teammates after a match is marked completed and both players have confirmed bookings.</p>}
       <h2>Choose your football avatar</h2>
-      <div className="bp-avatar-choices">{Object.entries(AVATARS).map(([key,emoji])=><button type="button" key={key} disabled={avatarBusy} className={profile.avatar_key===key&&!profile.avatar_path?"selected":""} onClick={()=>selectAvatar(key)} title={key} aria-label={"Use "+key+" avatar"}>{emoji}</button>)}</div>
+      <div className="bp-avatar-choices">{Object.entries(AVATARS).map(([key,emoji])=><button type="button" key={key} disabled={avatarBusy} className={profile.avatar_key===key&&!profile.avatar_path?"selected":""} onClick={()=>selectAvatar(key)} title={key} aria-label={"Use "+key+" avatar"}><FootballAvatar variant={key} size={46}/></button>)}</div>
       <label className="bp-upload-label">Or upload your own profile photo (JPG, PNG or WebP, max 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={uploadAvatar}/></label>
       <h2>Player profile</h2>
       <p>Your username is your public identity. Other players can use it to find you later.</p>
