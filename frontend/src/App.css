@@ -706,3 +706,14 @@ header.nav.scrolled {
 .bp-admin-list{display:grid;gap:14px}
 
 .bp-form-section{padding:80px 0;background:#0e110e;color:#fff}.bp-form-wrap{max-width:850px}.bp-form-wrap h2{font-size:clamp(2rem,4vw,3.3rem);margin:10px 0 16px}.bp-native-form{display:grid;gap:18px;margin-top:24px}.bp-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}.bp-native-form label{display:grid;gap:8px;font-size:14px;color:#ddd}.bp-native-form input,.bp-native-form select,.bp-native-form textarea{padding:13px;border:1px solid #505950;background:#171b17;color:#fff;border-radius:8px;width:100%;font:inherit}.bp-native-form textarea{min-height:110px}.bp-native-form button,.bp-request-button{background:#c6ff00;border:0;border-radius:8px;color:#0b1000;font-weight:800;padding:13px 20px;cursor:pointer}.bp-native-form button:disabled{opacity:.5}.bp-honeypot{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0!important}.bp-booking-overlay{position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}.bp-booking-dialog{position:relative;background:#111711;border:1px solid #435243;color:#fff;border-radius:16px;padding:32px;max-width:520px;width:100%;max-height:95vh;overflow-y:auto}.bp-booking-dialog h3{font-size:24px;margin:15px 0}.bp-dialog-close{float:right;background:transparent;border:0;color:#c6ff00;cursor:pointer}
+
+/* Dedicated BallersPlay MVP routes */
+.bp-inner-page{min-height:100vh;background:#080a08;color:#fff}
+.bp-inner-header{position:relative;z-index:5;background:#080a08;border-bottom:1px solid rgba(198,255,0,.18)}
+.bp-inner-nav{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:92px}
+.bp-inner-nav nav{display:flex;gap:24px;flex-wrap:wrap}
+.bp-inner-nav nav a{color:#f5f5f5;text-decoration:none;font-weight:600}
+.bp-inner-nav nav a:hover{color:#c6ff00}
+.bp-inner-page .bp-match-discovery,.bp-inner-page .bp-form-section{min-height:calc(100vh - 170px);padding-top:75px}
+.bp-inner-footer{padding:25px 0;border-top:1px solid rgba(255,255,255,.12);color:#aaa}
+@media(max-width:640px){.bp-inner-nav{align-items:flex-start;flex-direction:column;padding:20px 0}.bp-inner-nav nav{gap:16px;font-size:14px}}
