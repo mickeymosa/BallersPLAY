@@ -8,6 +8,7 @@ export default function AdminDashboard() {
   const [authorized, setAuthorized] = useState(false);
   const [matches, setMatches] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [players,setPlayers]=useState([]);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -29,13 +30,14 @@ export default function AdminDashboard() {
       if (!alive) return;
       if (error || profile?.role !== "admin") { setMessage("This account does not have BallersPlay administrator access."); return; }
       setAuthorized(true);
-      const [m, b] = await Promise.all([
+      const [m, b, playersResult] = await Promise.all([
         supabase.from("matches").select("*").order("starts_at", { ascending: false }).limit(100),
-        supabase.from("bookings").select("*").limit(100)
+        supabase.from("bookings").select("*").limit(100),
+        supabase.rpc("ballersplay_admin_player_directory")
       ]);
       if (!alive) return;
       if (m.error || b.error) setMessage("Unable to load admin data. Check database policies.");
-      else { setMatches(m.data || []); setBookings(b.data || []); }
+      else { setMatches(m.data || []); setBookings(b.data || []); if(!playersResult.error)setPlayers(playersResult.data||[]); }
     }
     load();
     return () => { alive = false; };
@@ -48,6 +50,13 @@ export default function AdminDashboard() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) setMessage(error.message);
     setPassword("");
+    setBusy(false);
+  }
+  async function verifyPlayer(id,verified){
+    setBusy(true);setMessage("");
+    const {error}=await supabase.rpc("ballersplay_verify_player",{p_player_id:id,p_verified:verified});
+    if(error)setMessage(error.message);
+    else setPlayers(list=>list.map(p=>p.player_id===id?{...p,is_verified:verified}:p));
     setBusy(false);
   }
   async function confirmBooking(id) {
@@ -84,6 +93,12 @@ export default function AdminDashboard() {
         <>
           <button onClick={()=>supabase.auth.signOut()}>Sign out</button>
           {authorized ? <>
+            <h2>Player verification ({players.length})</h2>
+            <p>Only approve accounts after independently checking their identity. Verification is not automatic.</p>
+            <div className="bp-admin-list">{players.map(p=><article key={p.player_id}>
+              <strong>{p.full_name}</strong><p>{p.username?"@"+p.username:"No username"} · {p.is_verified?"Verified":"Unverified"}</p>
+              <button disabled={busy} onClick={()=>verifyPlayer(p.player_id,!p.is_verified)}>{p.is_verified?"Remove verification":"Verify player"}</button>
+            </article>)}</div>
             <h2>Matches ({matches.length})</h2>
             {matches.length === 0 ? <p>No matches yet. Organizer submissions will be added in a later phase.</p> :
               <div className="bp-admin-list">{matches.map(m=><article key={m.id}>
