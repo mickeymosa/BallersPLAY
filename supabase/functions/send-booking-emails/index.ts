@@ -8,11 +8,15 @@ Deno.serve(async (req) => {
  if(!secret || bearer!==`Bearer ${secret}`) return new Response("Unauthorized",{status:401});
  const apiKey=Deno.env.get("RESEND_API_KEY"),from=Deno.env.get("BOOKING_EMAIL_FROM");
  if(!apiKey||!from) return new Response("Email service not configured",{status:503});
+ // While using Resend's test sender, restrict delivery to the account's verified inbox.
+ const testRecipient=(Deno.env.get("BOOKING_EMAIL_TEST_RECIPIENT")||"").trim().toLowerCase();
+ if(!testRecipient) return new Response("Test recipient allowlist is not configured",{status:503});
  const db=createClient(Deno.env.get("SUPABASE_URL")!,secret,{auth:{persistSession:false}});
  const {data:jobs,error}=await db.from("booking_email_outbox").select("*").is("sent_at",null).lt("attempts",5).order("created_at").limit(20);
  if(error) return new Response("Outbox unavailable",{status:500});
  let sent=0,failed=0;
  for(const job of jobs||[]){
+   if(String(job.recipient_email).toLowerCase()!==testRecipient) continue;
    const {data:claimed,error:claimError}=await db.from("booking_email_outbox").update({attempts:job.attempts+1}).eq("id",job.id).eq("attempts",job.attempts).is("sent_at",null).select("id");
    if(claimError||!claimed?.length)continue;
    const p=job.payload||{};
@@ -22,9 +26,10 @@ Deno.serve(async (req) => {
    const date=p.starts_at?new Date(p.starts_at).toLocaleString("en-GB",{timeZone:"Europe/Warsaw",dateStyle:"full",timeStyle:"short"}):"To be confirmed";
    const text=`Hello ${p.player_name||"player"},\n\n${state}\nMatch: ${title}\nWhen: ${date} (Poland time)\nWhere: ${[p.venue,p.city].filter(Boolean).join(", ")}\n\nPayments are arranged directly with the organizer after confirmation.\n\nBallersPlay`;
    try{
-     const res=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Authorization":`Bearer ${apiKey}`,"Content-Type":"application/json"},body:JSON.stringify({from,to:[job.recipient_email],subject,text,idempotency_key:`ballersplay-${job.id}`})});
+     const res=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Authorization":`Bearer ${apiKey}`,"Content-Type":"application/json","Idempotency-Key":`ballersplay-${job.id}`},body:JSON.stringify({from,to:[job.recipient_email],subject,text})});
      if(!res.ok)throw new Error(`Email provider HTTP ${res.status}`);
-     await db.from("booking_email_outbox").update({sent_at:new Date().toISOString(),last_error:null}).eq("id",job.id);
+     const {error:markError}=await db.from("booking_email_outbox").update({sent_at:new Date().toISOString(),last_error:null}).eq("id",job.id);
+     if(markError) throw new Error("Provider accepted email but outbox update failed");
      sent++;
    }catch(e){failed++;await db.from("booking_email_outbox").update({last_error:String(e).slice(0,250)}).eq("id",job.id);}
  }
