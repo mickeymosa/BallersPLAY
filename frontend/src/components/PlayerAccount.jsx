@@ -6,6 +6,7 @@ const validPhone = (value) => /^\+[1-9]\d{7,14}$/.test(value);
 export default function PlayerAccount() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [mode, setMode] = useState("signup");
   const [recovery, setRecovery] = useState(false);
   const [profileForm, setProfileForm] = useState({full_name:"",phone:""});
@@ -19,9 +20,10 @@ export default function PlayerAccount() {
     return () => subscription.unsubscribe();
   }, []);
   useEffect(() => {
-    if (!user || !supabase) { setProfile(null); return; }
+    if (!user || !supabase) { setProfile(null); setProfileLoading(false); return; }
+    setProfileLoading(true);
     supabase.from("player_profiles").select("full_name,phone").eq("id",user.id).maybeSingle()
-      .then(({data,error}) => { if (!error) { setProfile(data); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
+      .then(({data,error}) => { setProfileLoading(false); if (!error) { setProfile(data); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
   }, [user]);
   const update = (key, value) => setForm(prev => ({...prev,[key]:value}));
   async function submit(event) {
@@ -94,7 +96,7 @@ export default function PlayerAccount() {
     </form></section>;
   if (user) return <section className="bp-account-panel">
     <h1>My BallersPlay account</h1><p>Signed in as {user.email}</p>
-    {profile ? <p>{profile.full_name} · {profile.phone}</p> :
+    {profileLoading ? <p>Loading your profile…</p> : profile ? <p>{profile.full_name} · {profile.phone}</p> :
       <form className="bp-native-form" onSubmit={saveProfile}>
         <p>Complete your profile to book matches. A phone number is required, including for Google sign-in.</p>
         <label>Full name<input required minLength={2} maxLength={120} value={profileForm.full_name} onChange={e=>setProfileForm(p=>({...p,full_name:e.target.value}))}/></label>
