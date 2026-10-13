@@ -69,7 +69,7 @@ export default function App() {
 
   return (
     <div className="bp" data-testid="ballersplay-page">
-      {/* FIXED, LAG-FREE VIDEO BACKGROUND (z-index:-1) */}
+      {/* Cinematic football backdrop, dimmed to protect typography */}
       <div className="video-bg">
         <video
           autoPlay
@@ -91,8 +91,8 @@ export default function App() {
 
           <nav className="nav-links">
             <a href="#what-we-do" data-testid="nav-link-what-we-do">What We Do</a>
-            <a href="#events" data-testid="nav-link-events">Events</a>
-            <a href="#organizers" data-testid="nav-link-tournament">Organize a Game</a>
+            <a href="#players" data-testid="nav-link-events">For Players</a>
+            <a href="#organizers" data-testid="nav-link-tournament">For Organizers</a>
             <a href="#about" data-testid="nav-link-about">About</a>
           </nav>
 
@@ -113,8 +113,8 @@ export default function App() {
           <i className="fa-solid fa-xmark"></i>
         </button>
         <a href="#what-we-do" onClick={closeMenu}>What We Do</a>
-        <a href="#events" onClick={closeMenu}>Events</a>
-        <a href="#organizers" onClick={closeMenu}>Organize a Game</a>
+        <a href="#players" onClick={closeMenu}>For Players</a>
+        <a href="#organizers" onClick={closeMenu}>For Organizers</a>
         <a href="#about" onClick={closeMenu}>About</a>
         <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" onClick={closeMenu}>
           Find a Game
@@ -133,6 +133,7 @@ export default function App() {
             <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="hero-register-btn">
               Find a Game <i className="fa-solid fa-arrow-right"></i>
             </a>
+            <a href={ORGANIZER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Organize a Game <i className="fa-solid fa-arrow-right"></i></a>
             <a href="#what-we-do" className="btn btn-ghost">
               Explore <i className="fa-solid fa-chevron-down"></i>
             </a>
@@ -146,39 +147,29 @@ export default function App() {
 
       {/* SOLID CONTENT */}
       <main className="content">
-        {/* WHAT WE DO */}
-        <section className="section" id="what-we-do">
+        <section className="section bp-intro" id="what-we-do">
           <div className="container">
-            <div className="section-head reveal">
-              <span className="eyebrow">What We Do</span>
-              <h2 className="display">More Than A Game</h2>
-              <p>Connect with football players and organizers in Wrocław.</p>
-            </div>
-
-            <div className="feature-grid">
-              <div className="feature reveal">
-                <span className="num">01</span>
-                <div className="icon"><i className="fa-solid fa-bullhorn"></i></div>
-                <h3>Support Organizers</h3>
-                <p>Submit your football match and request help finding available players.</p>
-              </div>
-              <div className="feature reveal">
-                <span className="num">02</span>
-                <div className="icon"><i className="fa-solid fa-people-group"></i></div>
-                <h3>Connect Players</h3>
-                <p>Bringing local athletes together. Build your squad, meet rivals, and grow the community.</p>
-              </div>
-              <div className="feature reveal">
-                <span className="num">03</span>
-                <div className="icon"><i className="fa-solid fa-camera-retro"></i></div>
-                <h3>Confirm Your Spot</h3>
-                <p>Player requests are reviewed and confirmed before joining a match.</p>
-              </div>
+            <div className="section-head reveal"><span className="eyebrow">The local football network</span><h2 className="display">Less Searching.<br/><span className="hl">More Football.</span></h2><p>One community, two ways to get on the pitch. BallersPlay connects players looking for games with organizers looking for players in Wrocław.</p></div>
+            <div className="bp-steps">
+              <div className="bp-step reveal"><span>01 / DISCOVER</span><h3>Find your people.</h3><p>Players share their availability and interests. Organizers submit matches that need players.</p></div>
+              <div className="bp-step reveal"><span>02 / CONNECT</span><h3>Make the match.</h3><p>We review requests and connect players with suitable opportunities.</p></div>
+              <div className="bp-step reveal"><span>03 / PLAY</span><h3>Show up & play.</h3><p>Spots are confirmed with the organizer before anyone turns up to play.</p></div>
             </div>
           </div>
         </section>
-
-        <section className="section" id="organizers"><div className="container"><div className="section-head reveal"><span className="eyebrow">Football in Wrocław</span><h2 className="display">Play Together.</h2><p>BallersPlay helps players find football opportunities and independent organizers fill their matches.</p></div><div className="feature-grid"><article className="feature reveal"><div className="icon"><i className="fa-solid fa-futbol"></i></div><h3>Find a Game</h3><p>Tell us when and where you want to play. We'll reach out about suitable matches. Registration does not guarantee a spot.</p><a className="btn btn-primary" href={REGISTER_URL} target="_blank" rel="noopener noreferrer">Register as a Player</a></article><article className="feature reveal"><div className="icon"><i className="fa-solid fa-calendar-plus"></i></div><h3>Organize a Game</h3><p>Already running a football match? Submit your match details and available spots. We review submissions before publishing matches.</p><a className="btn btn-primary" href={ORGANIZER_URL} target="_blank" rel="noopener noreferrer" data-testid="organizer-submit-btn">Submit Your Match</a></article></div></div></section><section className="section tournament" id="events"><div className="container tournament-inner reveal"><span className="badge">Wrocław Pilot</span><h2 className="display">Get In The <span className="hl">Game.</span></h2><p>Join the local football community. We confirm match availability with organizers before confirming player spots.</p><a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Join as a Player</a> <a href={ORGANIZER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Organize a Match</a></div></section>
+        <section className="section bp-audience" id="players">
+          <div className="container bp-audience-grid">
+            <div className="bp-audience-copy reveal"><span className="eyebrow">For players</span><h2 className="display">Your Next<br/><span className="hl">Game Awaits.</span></h2><p>New to Wrocław? Missing a regular squad? Or just want more football in your week? Tell us when you want to play and we'll help you discover opportunities.</p><div className="bp-points"><span><i className="fa-solid fa-check"></i> Football-focused local community</span><span><i className="fa-solid fa-check"></i> No need to organize a full team</span><span><i className="fa-solid fa-check"></i> Confirmation before match day</span></div><a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Join as a Player <i className="fa-solid fa-arrow-right"></i></a><p className="bp-fineprint">Register your interest. A submitted form is not a confirmed match booking.</p></div>
+            <div className="bp-photo bp-photo-player reveal" role="img" aria-label="Football pitch under floodlights"><div className="bp-photo-label">WROCŁAW / FOOTBALL / COMMUNITY</div></div>
+          </div>
+        </section>
+        <section className="section bp-audience bp-organizer-section" id="organizers">
+          <div className="container bp-audience-grid bp-organizer-grid">
+            <div className="bp-photo bp-photo-organizer reveal" role="img" aria-label="Football players on a pitch"><div className="bp-photo-label">BUILT FOR INDEPENDENT ORGANIZERS</div></div>
+            <div className="bp-audience-copy reveal"><span className="eyebrow">For organizers</span><h2 className="display">You Run The Game.<br/><span className="hl">We Help Fill It.</span></h2><p>Already organizing football in Wrocław? Keep control of your match while BallersPlay helps you reach players interested in joining.</p><div className="bp-points"><span><i className="fa-solid fa-check"></i> Submit match details and open spots</span><span><i className="fa-solid fa-check"></i> Reach players outside your usual group</span><span><i className="fa-solid fa-check"></i> Review participants before confirmation</span></div><a href={ORGANIZER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary" data-testid="organizer-submit-btn">Submit Your Match <i className="fa-solid fa-arrow-right"></i></a><p className="bp-fineprint">Submitting a match is a request, not automatic publication or a guaranteed player match.</p></div>
+          </div>
+        </section>
+        <section className="section bp-final-cta" id="events"><div className="container reveal"><span className="eyebrow">Wrocław pilot</span><h2 className="display">Football Happens<br/><span className="hl">Together.</span></h2><p>We're starting with local players and organizers, learning from real matches, and building something worth coming back to.</p><div className="hero-actions"><a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Find a Game <i className="fa-solid fa-arrow-right"></i></a><a href={ORGANIZER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">Organize a Game <i className="fa-solid fa-arrow-right"></i></a></div></div></section>
         {/* ABOUT */}
         <section className="section about" id="about">
           <div className="container about-grid">
@@ -216,8 +207,8 @@ export default function App() {
             <div className="footer-col">
               <h4>Explore</h4>
               <a href="#what-we-do">What We Do</a>
-              <a href="#events">Events</a>
-              <a href="#organizers">Organize a Game</a>
+              <a href="#players">For Players</a>
+              <a href="#organizers">For Organizers</a>
               <a href="#about">About</a>
             </div>
 
