@@ -758,3 +758,36 @@ header.nav.scrolled {
 .bp-avatar-choices button.selected {border:2px solid #c6ff00}
 .bp-upload-label {display:grid;gap:8px}
 .bp-upload-label input {max-width:100%}
+
+/* Big-head football avatar customizer */
+.bp-customizer{margin:24px 0;padding:22px;background:#0d1722;border:1px solid #273747;border-radius:20px;color:#f7f9ff}
+.bp-customizer h2{font-size:clamp(1.45rem,3vw,2rem);line-height:1.2;margin:5px 0}
+.bp-customizer h3{font-size:1rem;margin:0 0 12px}
+.bp-customizer-kicker{font-size:.7rem;font-weight:800;letter-spacing:.15em;color:#c6ff00}
+.bp-customizer p{color:#acbbcc}
+.bp-customizer-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(240px,.8fr);gap:22px;margin-top:20px}
+.bp-customizer-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.bp-customizer-grid button{display:flex;align-items:center;flex-direction:column;gap:4px;background:#1b2a39;border:2px solid #2a3948;border-radius:12px;padding:8px 2px;color:#fff;cursor:pointer;text-transform:capitalize;font-size:.75rem}
+.bp-customizer-grid button.active{border-color:#c6ff00;background:#27392b}
+.bp-customizer-grid svg{width:min(100%,94px)}
+.bp-customizer-options{display:grid;gap:13px;margin-top:20px}
+.bp-customizer-options fieldset{border:0;padding:0;min-width:0}
+.bp-customizer-options legend{font-weight:700;font-size:.85rem;margin-bottom:9px}
+.bp-color-options{display:flex;gap:9px;flex-wrap:wrap}
+.bp-color-options button{width:33px;height:33px;border-radius:50%;border:2px solid #7b8793;cursor:pointer}
+.bp-color-options button.active{outline:3px solid #c6ff00;outline-offset:2px}
+.bp-customizer-options label{display:grid;gap:6px;font-weight:700;font-size:.85rem}
+.bp-customizer-options select{background:#1b2a39;color:white;border:1px solid #455463;border-radius:9px;padding:10px;text-transform:capitalize}
+.bp-customizer-preview{min-width:0;border:1px solid #2c4157;background:#101d2c;border-radius:16px;padding:13px;align-self:start}
+.bp-avatar-stadium{min-height:265px;border-radius:13px;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 110%,#55843e 0%,#224d32 25%,#122c47 55%,#315d91 100%)}
+.bp-avatar-stadium svg{max-width:90%;filter:drop-shadow(0 9px 10px #07121e99)}
+.bp-stadium-lights{color:#f5f8ff;font-size:1.3rem;letter-spacing:1.2em;white-space:nowrap}
+.bp-avatar-player-name{display:grid;gap:2px;margin:14px 0}
+.bp-avatar-player-name strong{font-size:1.15rem}
+.bp-avatar-player-name span{font-size:.85rem;color:#9faec1}
+.bp-customizer-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.bp-customizer-actions button{padding:12px 8px;border:0;border-radius:10px;font-weight:800;cursor:pointer}
+.bp-avatar-random{background:#2c3b4a;color:white}
+.bp-avatar-save{background:#c6ff00;color:#101a00}
+.bp-avatar-save:disabled{opacity:.5;cursor:wait}
+@media(max-width:750px){.bp-customizer-layout{grid-template-columns:1fr}.bp-customizer{padding:14px}.bp-customizer-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.bp-avatar-stadium{min-height:230px}}
