@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/manage",
+      "destination": "/index.html"
+    },
+    {
       "source": "/account",
       "destination": "/index.html"
     },
