@@ -7,6 +7,7 @@ const validPhone = (value) => /^\+[1-9]\d{7,14}$/.test(value);
 
 export default function PlayerAccount() {
   const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [stats, setStats] = useState(null);
@@ -26,10 +27,21 @@ export default function PlayerAccount() {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   useEffect(() => {
-    if (!supabase) return;
-    supabase.auth.getUser().then(({data}) => setUser(data.user || null));
-    const {data:{subscription}} = supabase.auth.onAuthStateChange((event, session) => { if (event === "PASSWORD_RECOVERY") setRecovery(true); setUser(session?.user || null); });
-    return () => subscription.unsubscribe();
+    if (!supabase) {setAuthLoading(false);return;}
+    let mounted = true;
+    supabase.auth.getSession().then(({data,error}) => {
+      if (!mounted) return;
+      if (error) setNotice("Session restore failed: " + error.message);
+      setUser(data.session?.user || null);
+      setAuthLoading(false);
+    }).catch(error => {if(mounted){setAuthLoading(false);setNotice(error.message || "Unable to restore session.");}});
+    const {data:{subscription}} = supabase.auth.onAuthStateChange((event,session) => {
+      if (!mounted) return;
+      if(event==="PASSWORD_RECOVERY")setRecovery(true);
+      setUser(session?.user || null);
+      setAuthLoading(false);
+    });
+    return () => {mounted=false;subscription.unsubscribe();};
   }, []);
   useEffect(() => {
     if (!user || !supabase) { setProfile(null); setProfileLoading(false); return; }
@@ -126,7 +138,7 @@ export default function PlayerAccount() {
     });
     if (error) setNotice(error.message);
     else {
-      const {data} = await supabase.from("player_profiles").select("full_name,phone").eq("id",user.id).maybeSingle();
+      const {data} = await supabase.from("player_profiles").select("full_name,phone,username,avatar_key,avatar_path,is_verified").eq("id",user.id).maybeSingle();
       setProfile(data);
       setNotice("Your account is ready to book.");
     }
@@ -161,6 +173,7 @@ export default function PlayerAccount() {
     if (error) setNotice(error.message);
     else {setRecovery(false);setNotice("Password updated.");}
   }
+  if (authLoading) return <section className="bp-account-panel"><h1>My BallersPlay account</h1><p role="status">Restoring your login…</p></section>;
   if (recovery) return <section className="bp-account-panel"><h1>Choose a new password</h1>
     <form className="bp-native-form" onSubmit={changePassword}>
       <label>New password<input type="password" required minLength={8} autoComplete="new-password" value={form.password} onChange={e=>update("password",e.target.value)}/></label>
@@ -168,7 +181,7 @@ export default function PlayerAccount() {
       <button disabled={busy}>Update password</button>{notice && <p role="status">{notice}</p>}
     </form></section>;
   if (user) return <section className="bp-account-panel">
-    <h1>My BallersPlay account</h1><p>Signed in as {user.email}</p>
+    <h1>My BallersPlay account</h1><p>Signed in as {user.email}</p><p><a href="/account" className="btn btn-primary">My Profile</a></p>
     {profileLoading ? <p>Loading your profile…</p> : profile ? <p>{profile.full_name} · {profile.phone}</p> :
       <form className="bp-native-form" onSubmit={saveProfile}>
         <p>Complete your profile to book matches. A phone number is required, including for Google sign-in.</p>
