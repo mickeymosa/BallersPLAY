@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
  // Require a gateway-verified service_role JWT instead of comparing key strings.
  let role: string | undefined;
  try {
-   const token = bearer.match(/^Bearer\\s+([^\\s]+)$/i)?.[1];
+   const token = bearer.match(/^Bearer\s+([^\s]+)$/i)?.[1];
    const payload = token?.split(".")[1];
    if (payload && token?.split(".").length === 3) {
      role = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))).role;
