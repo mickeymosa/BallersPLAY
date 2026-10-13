@@ -717,3 +717,18 @@ header.nav.scrolled {
 .bp-inner-page .bp-match-discovery,.bp-inner-page .bp-form-section{min-height:calc(100vh - 170px);padding-top:75px}
 .bp-inner-footer{padding:25px 0;border-top:1px solid rgba(255,255,255,.12);color:#aaa}
 @media(max-width:640px){.bp-inner-nav{align-items:flex-start;flex-direction:column;padding:20px 0}.bp-inner-nav nav{gap:16px;font-size:14px}}
+
+/* Player account registration */
+.bp-account-panel { width:min(100% - 36px,540px); margin:80px auto 100px; padding:36px; background:#101012; border:1px solid rgba(255,255,255,.14); border-radius:18px; color:#fff; }
+.bp-account-panel h1 {font-size:clamp(1.6rem,4vw,2.3rem);margin-bottom:10px}
+.bp-account-panel > p {color:#bbb;margin-bottom:20px}
+.bp-account-panel .bp-native-form {display:grid;gap:14px}
+.bp-account-panel .bp-native-form label {display:grid;gap:6px;font-weight:600}
+.bp-account-panel .bp-native-form input {width:100%;padding:12px 14px;background:#1a1a1d;border:1px solid #555;border-radius:8px;color:#fff}
+.bp-account-panel .bp-native-form button {padding:14px;border:0;border-radius:8px;background:#c6ff00;color:#111;font-weight:800;cursor:pointer}
+.bp-account-panel .bp-native-form button:disabled {opacity:.6;cursor:wait}
+.bp-account-actions {display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.bp-account-actions button {background:none;border:0;color:#c6ff00;cursor:pointer;font-weight:700}
+.bp-account-nav-link {margin-right:14px;color:#c6ff00!important;font-weight:700}
+.bp-booking-dialog a {color:#a4d800;text-decoration:underline}
+@media(max-width:700px){.bp-account-panel{padding:24px;margin:40px auto}.bp-account-nav-link{display:none}}
