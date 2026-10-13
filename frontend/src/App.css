@@ -644,3 +644,43 @@ header.nav.scrolled {
   .footer-top { grid-template-columns: 1fr; }
   .hero p.sub { font-size: 1.05rem; }
 }
+
+/* 2026 football-first rebrand: immersive full-page background with readable layers */
+:root { --bg:#070a08; --bg-soft:#0b110e; --bg-card:#101713; --line:rgba(224,255,231,.13); --muted:#b4c1b8; --maxw:1320px; }
+.bp { isolation:isolate; }
+.video-bg { z-index:0; opacity:.30; }
+.video-bg::after { background:linear-gradient(180deg,rgba(3,8,5,.7),rgba(3,8,5,.86)),linear-gradient(90deg,rgba(0,0,0,.45),transparent 75%); }
+.bp .content { background:transparent; }
+.bp .content::before { content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 90% 13%,rgba(151,220,35,.12),transparent 30%),radial-gradient(ellipse at 5% 52%,rgba(38,121,78,.14),transparent 32%),linear-gradient(180deg,rgba(5,10,7,.90),rgba(6,13,9,.80) 40%,rgba(5,10,7,.94)); }
+.bp .section { scroll-margin-top:95px; }
+.bp .hero { z-index:1; }
+.bp .section-head {max-width:850px;}
+.bp .section-head .hl,.bp-audience .hl,.bp-final-cta .hl {color:var(--accent);}
+.bp .section-head p {max-width:690px;line-height:1.85;}
+.bp-steps {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.bp-step {border:1px solid var(--line);background:rgba(16,25,19,.78);backdrop-filter:blur(14px);border-radius:18px;padding:36px;min-height:240px;}
+.bp-step>span {color:var(--accent);font-size:.7rem;letter-spacing:2px;font-weight:800;}
+.bp-step h3 {font-size:1.45rem;margin:24px 0 12px;line-height:1.25;}
+.bp-step p {color:var(--muted);line-height:1.8;font-size:.95rem;}
+.bp-audience {border-top:1px solid var(--line);}
+.bp-audience-grid {display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,100px);align-items:center;}
+.bp-audience-copy h2 {font-size:clamp(3rem,5.7vw,5.6rem);margin-bottom:28px;}
+.bp-audience-copy>p {color:#d2ded5;font-size:1.06rem;line-height:1.85;max-width:560px;}
+.bp-points {display:flex;flex-direction:column;gap:15px;margin:28px 0 34px;font-size:.93rem;font-weight:600;}
+.bp-points i {color:var(--accent);margin-right:12px;}
+.bp-audience-copy .bp-fineprint {font-size:.77rem;color:var(--muted);margin-top:20px;}
+.bp-photo {min-height:510px;position:relative;border-radius:22px;border:1px solid rgba(255,255,255,.14);overflow:hidden;background-position:center;background-size:cover;box-shadow:0 35px 90px rgba(0,0,0,.28);}
+.bp-photo::after {content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.82));}
+.bp-photo-player {background-image:url('https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=1100&q=85');}
+.bp-photo-organizer {background-image:url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1100&q=85');}
+.bp-photo-label {position:absolute;bottom:28px;left:30px;z-index:1;font-size:.72rem;letter-spacing:2px;font-weight:800;color:var(--accent);}
+.bp-organizer-section {background:linear-gradient(105deg,rgba(14,29,18,.45),rgba(7,14,9,.15));}
+.bp-final-cta {text-align:center;border-top:1px solid var(--line);background:radial-gradient(ellipse at 50% 0%,rgba(198,255,0,.11),transparent 65%);}
+.bp-final-cta h2 {font-size:clamp(3.5rem,7vw,7rem);margin:12px auto 25px;}
+.bp-final-cta p {max-width:650px;margin:0 auto 34px;color:#d4ded7;line-height:1.8;}
+.bp-final-cta .hero-actions {justify-content:center;}
+.bp .btn {min-height:52px;justify-content:center;}
+.bp .btn:focus-visible,.bp a:focus-visible,.bp button:focus-visible {outline:3px solid var(--accent);outline-offset:4px;}
+@media(max-width:900px){.bp-audience-grid{grid-template-columns:1fr;gap:40px}.bp-organizer-grid .bp-photo{order:2}.bp-steps{grid-template-columns:1fr}.bp-photo{min-height:350px}}
+@media(max-width:600px){.bp .section{padding:78px 0}.bp-step{padding:28px;min-height:auto}.bp-audience-copy h2{font-size:clamp(2.7rem,11vw,4.5rem)}.bp-photo{min-height:280px}.bp .hero{min-height:650px}.bp .hero-actions .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.bp .reveal{opacity:1;transform:none;transition:none}.bp *{scroll-behavior:auto!important}}
