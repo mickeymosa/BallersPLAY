@@ -50,3 +50,14 @@ Use schedule `* * * * *` only after manual end-to-end verification. Cron job SQL
 
 ## Delivery semantics
 Atomic `FOR UPDATE SKIP LOCKED` claims prevent simultaneous workers from claiming the same pending row. Leases expire after three minutes; retry backoff is bounded, with a maximum of five attempts. Resend's idempotency header reduces duplicates, but cannot guarantee exactly-once delivery in all failure cases. Review delivery monitoring before public launch.
+
+
+## Authentication fix (commit 90f4b07)
+The previously deployed function compared the incoming legacy service_role JWT byte-for-byte to `SUPABASE_SERVICE_ROLE_KEY`. Supabase can expose a different service-role API key in that environment, producing HTTP 401 `Unauthorized` even after the gateway accepts a valid JWT. The function now checks the JWT's `role=service_role` claim **only after Supabase Edge gateway verification**. **Keep `verify_jwt=true`**. Do not use this implementation with JWT verification disabled: its payload parsing does not independently verify a signature.
+
+Deployment order:
+1. Confirm `20261013020000_booking_email_outbox.sql` and `20261013030000_booking_email_delivery_leases.sql` were already run in Supabase SQL Editor (do not recreate data).
+2. Deploy `supabase/functions/send-booking-emails/index.ts` with Verify JWT ON.
+3. Manually invoke the existing Vault-backed `net.http_post` SQL once and inspect `net._http_response` for HTTP 200.
+4. Check response `sent`, `failed`, outbox `sent_at`, and Resend delivery logs. A 200 with sent=0 is not a delivered email.
+5. Only after confirmed delivery create `ballersplay-email-dispatcher` Cron using SQL Snippet `* * * * *`. Never put the service-role JWT literal into the cron command.
