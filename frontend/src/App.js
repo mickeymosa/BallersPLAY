@@ -3,6 +3,8 @@ import "@/App.css";
 import MatchDiscovery from "./components/MatchDiscovery";
 import AdminDashboard from "./components/AdminDashboard";
 import OrganizerSubmission from "./components/OrganizerSubmission";
+import PlayerAccount from "./components/PlayerAccount";
+import AccountNav from "./components/AccountNav";
 
 
 const REGISTER_URL = "https://tally.so/r/rjgQ9v";
@@ -72,13 +74,13 @@ export default function App() {
 
   const page = window.location.pathname.replace(/\/$/, "") || "/";
   if (page === "/admin") return <AdminDashboard />;
-  if (page === "/matches" || page === "/organize") return (
+  if (page === "/matches" || page === "/organize" || page === "/account" || page === "/profile") return (
     <div className="bp bp-inner-page">
       <header className="bp-inner-header"><div className="container bp-inner-nav">
         <a href="/" className="logo"><LogoMark fallbackId="innerLogoFallback" /></a>
-        <nav><a href="/">Home</a><a href="/matches">Find Matches</a><a href="/organize">Organize a Match</a></nav>
+        <nav><a href="/">Home</a><a href="/matches">Find Matches</a><a href="/organize">Organize a Match</a><AccountNav /></nav>
       </div></header>
-      <main>{page === "/matches" ? <MatchDiscovery /> : <OrganizerSubmission />}</main>
+      <main>{page === "/matches" ? <MatchDiscovery /> : (page === "/account" || page === "/profile") ? <PlayerAccount /> : <OrganizerSubmission />}</main>
       <footer className="bp-inner-footer"><div className="container">BallersPlay · Wrocław football community</div></footer>
     </div>
   );
@@ -112,7 +114,7 @@ export default function App() {
             <a href="#about" data-testid="nav-link-about">About</a>
           </nav>
 
-          <div className="nav-cta">
+          <div className="nav-cta"><AccountNav />
             <a href="/matches" className="btn btn-primary" data-testid="nav-register-btn">
               Find a Game <i className="fa-solid fa-arrow-right"></i>
             </a>
@@ -132,6 +134,7 @@ export default function App() {
         <a href="#players" onClick={closeMenu}>For Players</a>
         <a href="#organizers" onClick={closeMenu}>For Organizers</a>
         <a href="#about" onClick={closeMenu}>About</a>
+        <AccountNav />
         <a href="/matches" className="btn btn-primary" onClick={closeMenu}>
           Find a Game
         </a>

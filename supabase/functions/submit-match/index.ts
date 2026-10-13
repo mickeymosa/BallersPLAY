@@ -4,10 +4,17 @@ const respond = (body: unknown, status=200, origin="") => new Response(JSON.stri
 Deno.serve(async req => {
   const allowed = (Deno.env.get("ALLOWED_ORIGINS") || "").split(",").map(x=>x.trim()).filter(Boolean);
   const origin = req.headers.get("origin") || "";
-  if (!allowed.includes(origin)) return respond({error:"Origin not allowed"},403);
+  const validOrigin = allowed.includes(origin) || /^https:\/\/ballers-play(?:-[a-z0-9-]+)?-mickeymosas-projects\.vercel\.app$/.test(origin);
+  if (!validOrigin) return respond({error:"Origin not allowed"},403);
   if(req.method==="OPTIONS") return new Response(null,{status:204,headers:{...headers,"Access-Control-Allow-Origin":origin}});
   if(req.method!=="POST") return respond({error:"Method not allowed"},405,origin);
   try {
+    const token=(req.headers.get("authorization")||"").match(/^Bearer\s+([^\s]+)$/i)?.[1];
+    if(!token)return respond({error:"Sign in to organize a match."},401,origin);
+    const url=Deno.env.get("SUPABASE_URL")!;
+    const authClient=createClient(url,(Deno.env.get("SUPABASE_ANON_KEY")||Deno.env.get("SUPABASE_PUBLISHABLE_KEY"))!,{auth:{persistSession:false}});
+    const {data:{user},error:authError}=await authClient.auth.getUser(token);
+    if(authError||!user?.email)return respond({error:"Please log in again."},401,origin);
     const input=await req.json();
     if(input.website) return respond({error:"Unable to submit"},400,origin);
     const name=String(input.name||"").trim(),email=String(input.email||"").trim().toLowerCase(),phone=String(input.phone||"").trim();
@@ -15,10 +22,18 @@ Deno.serve(async req => {
     const format=String(input.format||"5v5"),starts_at=String(input.starts_at||"");
     const capacity=Number(input.capacity),price_pln=Number(input.price_pln);
     if(name.length<2||name.length>120||!/^\S+@\S+\.\S+$/.test(email)||email.length>254||phone.length>40||title.length<3||title.length>160||venue.length<3||venue.length>200||description.length>1500||!["5v5","6v6","7v7","8v8","11v11"].includes(format)||!Number.isInteger(capacity)||capacity<1||capacity>100||!Number.isFinite(price_pln)||price_pln<0||price_pln>10000||!Number.isFinite(Date.parse(starts_at))||Date.parse(starts_at)<Date.now()+3600000) return respond({error:"Please check your match details."},400,origin);
-    const url=Deno.env.get("SUPABASE_URL")!,key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const db=createClient(url,key,{auth:{persistSession:false}});
-    const {data:org,error:orgErr}=await db.from("organizers").insert({name,email,phone:phone||null}).select("id").single();
-    if(orgErr) throw orgErr;
+    const {data:profile,error:profileError}=await db.from("player_profiles").select("full_name,phone").eq("id",user.id).maybeSingle();
+    if(profileError||!profile)return respond({error:"Complete your account profile before organizing."},403,origin);
+    if(email!==user.email.toLowerCase()||name!==profile.full_name||phone!==profile.phone)return respond({error:"Contact details must match your account."},400,origin);
+    let {data:org,error:orgErr}=await db.from("organizers").select("id").eq("owner_id",user.id).limit(1).maybeSingle();
+    if(orgErr)throw orgErr;
+    if(!org){
+      const created=await db.from("organizers").insert({owner_id:user.id,name,email,phone}).select("id").single();
+      if(created.error)throw created.error;
+      org=created.data;
+    }
     const {error}=await db.from("matches").insert({organizer_id:org.id,title,city:"Wrocław",venue,starts_at:new Date(starts_at).toISOString(),format,capacity,price_pln,description:description||null,status:"pending"});
     if(error) throw error;
     return respond({ok:true,message:"Match submitted for review."},201,origin);
