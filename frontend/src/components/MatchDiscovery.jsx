@@ -9,7 +9,8 @@ export default function MatchDiscovery() {
     if (!supabase) return;
     let alive = true;
     const refresh = async () => {
-      const {data:{user}} = await supabase.auth.getUser();
+      const {data:{session}} = await supabase.auth.getSession();
+      const user = session?.user || null;
       if (!alive) return;
       setAccount(user || null);
       if (!user) {setProfile(null);return;}
@@ -36,9 +37,9 @@ export default function MatchDiscovery() {
       const status=error?.context?.status;
       if(!detail&&error?.context?.json){try{detail=(await error.context.json())?.error;}catch(_){}}
       if(!detail&&status===401) detail="Authorization failed (401). Check request-spot JWT verification.";
-      if(!detail&&status===403) detail="Origin not allowed (403). Check ALLOWED_ORIGINS.";
+      if(!detail&&status===403) detail="Booking unavailable: complete your profile or use the latest BallersPlay website.";
       if(!detail&&status) detail="Booking failed (HTTP "+status+"). Check request-spot function logs.";
-      if(!detail) detail="Network or CORS error. Check ALLOWED_ORIGINS and browser Network tab.";
+      if(!detail) detail="Unable to contact booking service. Please retry or contact support.";
       setRequestState("error");setRequestMessage(detail);return;
     }
     setRequestState("success");setRequestMessage("Request sent. Your spot is not confirmed yet.");
@@ -89,7 +90,7 @@ export default function MatchDiscovery() {
           <button type="button" className="bp-dialog-close" onClick={()=>setSelected(null)}>Close ×</button>
           <h3>Request a spot: {selected.title}</h3><p>Submitting a request does not confirm a booking. Pay the organizer directly only after confirmation.</p>
           {!account ? <p>To request a spot, <a href="/account?next=matches"><strong>create an account or log in</strong></a>. Registration requires a phone number.</p> :
-          !profile ? <p>Your account profile is incomplete. Please contact support.</p> :
+          !profile ? <p>Your account profile is incomplete. <a href="/profile">Complete your profile</a> to book a match.</p> :
           requestState==="success"?<p role="status">{requestMessage}</p>:<form onSubmit={requestSpot} className="bp-native-form">
             <label>Your name<input readOnly required minLength={2} maxLength={120} value={player.player_name} onChange={e=>setPlayer(x=>({...x,player_name:e.target.value}))}/></label>
             <label>Email<input readOnly type="email" required value={player.player_email} onChange={e=>setPlayer(x=>({...x,player_email:e.target.value}))}/></label>
