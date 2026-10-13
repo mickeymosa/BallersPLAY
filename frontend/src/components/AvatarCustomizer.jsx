@@ -1,8 +1,9 @@
 import {useEffect,useState} from "react";
+import PlayerCard from "./PlayerCard";
 import FootballAvatar,{AVATAR_STYLES,AVATAR_SKINS,AVATAR_HAIRS,AVATAR_JERSEYS,AVATAR_HAIR_STYLES,AVATAR_EXPRESSIONS,avatarPreset,sanitizeAvatar} from "./FootballAvatar";
 
 const choices=[["skin","Skin tone",AVATAR_SKINS],["hair","Hair color",AVATAR_HAIRS],["jersey","Jersey color",AVATAR_JERSEYS]];
-export default function AvatarCustomizer({profile,onSave,busy=false}){
+export default function AvatarCustomizer({profile,stats,onSave,busy=false}){
  const [draft,setDraft]=useState(()=>sanitizeAvatar(profile.avatar_config && Object.keys(profile.avatar_config).length?profile.avatar_config:avatarPreset(profile.avatar_key)));
  const [preset,setPreset]=useState(profile.avatar_key||"striker");
  const [notice,setNotice]=useState("");
@@ -31,7 +32,7 @@ export default function AvatarCustomizer({profile,onSave,busy=false}){
      <label>Expression<select value={draft.expression} onChange={e=>update("expression",e.target.value)}>{AVATAR_EXPRESSIONS.map(x=><option key={x} value={x}>{x}</option>)}</select></label>
     </div>
    </div>
-   <div className="bp-customizer-preview"><div className="bp-avatar-stadium"><div className="bp-stadium-lights">✦　✦　✦</div><FootballAvatar config={draft} size={275}/></div>
+   <div className="bp-customizer-preview"><PlayerCard profile={profile} stats={stats} config={draft} preview/>
     <div className="bp-avatar-player-name"><strong>{profile.full_name||"Your footballer"}</strong><span>{profile.username?"@"+profile.username:"Your BallersPlay avatar"}</span></div>
     <div className="bp-customizer-actions"><button type="button" className="bp-avatar-random" onClick={()=>choose(AVATAR_STYLES[Math.floor(Math.random()*AVATAR_STYLES.length)])}>Random avatar</button>
      <button type="button" className="bp-avatar-save" disabled={busy} onClick={save}>{busy?"Saving…":"Save avatar"}</button></div>
