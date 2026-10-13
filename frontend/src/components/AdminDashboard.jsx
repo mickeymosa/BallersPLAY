@@ -50,6 +50,13 @@ export default function AdminDashboard() {
     setPassword("");
     setBusy(false);
   }
+  async function changeBookingStatus(id,status) {
+    setBusy(true);setMessage("");
+    const {error}=await supabase.from("bookings").update({status}).eq("id",id);
+    if(error)setMessage(error.message);
+    else setBookings(prev=>prev.map(b=>b.id===id?{...b,status}:b));
+    setBusy(false);
+  }
   async function changeMatchStatus(id, status) {
     setBusy(true); setMessage("");
     const { error } = await supabase.from("matches").update({ status }).eq("id", id);
@@ -79,7 +86,11 @@ export default function AdminDashboard() {
               </article>)}</div>}
             <h2>Booking requests ({bookings.length})</h2>
             <p>Booking approvals will be enabled after capacity and payment-state validation is implemented.</p>
-            {bookings.map(b=><p key={b.id}>{b.player_name || "Player"} — {b.status}</p>)}
+            {bookings.map(b=><article key={b.id}>
+              <strong>{b.player_name || "Player"}</strong><p>{b.player_email} · {b.status}</p>
+              {b.status==="requested"&&<><button disabled={busy} onClick={()=>changeBookingStatus(b.id,"waitlisted")}>Waitlist</button><button disabled={busy} onClick={()=>changeBookingStatus(b.id,"rejected")}>Reject</button></>}
+              {b.status==="confirmed"&&<button disabled={busy} onClick={()=>changeBookingStatus(b.id,"cancelled")}>Cancel</button>}
+            </article>)}
           </> : <p>Checking administrator permissions…</p>}
         </>}
       {message && <p role="alert">{message}</p>}
