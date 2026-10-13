@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import FootballAvatar,{avatarPreset} from "./FootballAvatar";
 import AvatarCustomizer from "./AvatarCustomizer";
+import PlayerCard from "./PlayerCard";
 
 const AVATARS = {striker:"⚽",keeper:"🧤",captain:"🏆",playmaker:"🎯",defender:"🛡️",speedster:"⚡"};
 const validPhone = (value) => /^\+[1-9]\d{7,14}$/.test(value);
@@ -12,6 +13,7 @@ export default function PlayerAccount() {
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [stats, setStats] = useState(null);
+  const [cardStats,setCardStats]=useState(null);
   const [candidates,setCandidates]=useState([]);
   const [reviewTarget,setReviewTarget]=useState("");
   const [rating,setRating]=useState("5");
@@ -53,6 +55,7 @@ export default function PlayerAccount() {
   useEffect(() => {
     if (!user || !profile) {setStats(null);return;}
     supabase.rpc("ballersplay_profile_stats",{p_player_id:user.id}).then(({data})=>setStats(data?.[0]||null));
+    supabase.rpc("ballersplay_player_card",{p_player_id:user.id}).then(({data,error})=>{if(!error)setCardStats(data?.[0]||null);});
     supabase.rpc("ballersplay_review_candidates").then(({data})=>setCandidates(data||[]));
   }, [user,profile]);
   async function submitReview(event) {
@@ -193,6 +196,7 @@ export default function PlayerAccount() {
         <button disabled={busy}>Save profile</button>
       </form>}
     {profile && <div className="bp-profile-features">
+      <div className="bp-profile-card-feature"><PlayerCard profile={profile} stats={{...stats,...cardStats}}/></div>
       <div className="bp-profile-hero">
         <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile avatar"/>:<FootballAvatar variant={profile.avatar_key} config={profile.avatar_config&&Object.keys(profile.avatar_config).length?profile.avatar_config:avatarPreset(profile.avatar_key)} size={86}/>}</div>
         <div><h2>{profile.full_name}</h2><p>{profile.username?"@"+profile.username:"Choose a username below"}</p>
@@ -215,7 +219,7 @@ export default function PlayerAccount() {
         <label>Comment (optional)<textarea maxLength={500} rows={3} value={reviewComment} onChange={e=>setReviewComment(e.target.value)}/></label>
         <button disabled={busy}>Submit review</button>
       </form> : <p>You can review teammates after a match is marked completed and both players have confirmed bookings.</p>}
-      <AvatarCustomizer profile={profile} onSave={saveCustomizedAvatar} busy={avatarBusy}/>
+      <AvatarCustomizer profile={profile} stats={{...stats,...cardStats}} onSave={saveCustomizedAvatar} busy={avatarBusy}/>
       <label className="bp-upload-label">Or upload your own profile photo (JPG, PNG or WebP, max 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={uploadAvatar}/></label>
       <h2>Player profile</h2>
       <p>Your username is your public identity. Other players can use it to find you later.</p>
