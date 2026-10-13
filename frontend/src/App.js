@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "@/App.css";
 import MatchDiscovery from "./components/MatchDiscovery";
 import AdminDashboard from "./components/AdminDashboard";
+import OrganizerSubmission from "./components/OrganizerSubmission";
 
 
 const REGISTER_URL = "https://tally.so/r/rjgQ9v";
@@ -162,6 +163,7 @@ export default function App() {
           </div>
         </section>
         <MatchDiscovery />
+        <OrganizerSubmission />
         <section className="section bp-audience" id="players">
           <div className="container bp-audience-grid">
             <div className="bp-audience-copy reveal"><span className="eyebrow">For players</span><h2 className="display">Your Next<br/><span className="hl">Game Awaits.</span></h2><p>New to Wrocław? Missing a regular squad? Or just want more football in your week? Tell us when you want to play and we'll help you discover opportunities.</p><div className="bp-points"><span><i className="fa-solid fa-check"></i> Football-focused local community</span><span><i className="fa-solid fa-check"></i> No need to organize a full team</span><span><i className="fa-solid fa-check"></i> Confirmation before match day</span></div><a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Join as a Player <i className="fa-solid fa-arrow-right"></i></a><p className="bp-fineprint">Register your interest. A submitted form is not a confirmed match booking.</p></div>
