@@ -4,7 +4,11 @@ const respond = (body: unknown,status=200,origin="")=>new Response(JSON.stringif
 Deno.serve(async req=>{
   const allowed=(Deno.env.get("ALLOWED_ORIGINS")||"").split(",").map(x=>x.trim()).filter(Boolean);
   const origin=req.headers.get("origin")||"";
-  if(!allowed.includes(origin))return respond({error:"Origin not allowed"},403);
+  // Restrict previews to this project's Vercel deployment namespace.
+  const validOrigin = allowed.includes(origin) ||
+    /^https:\/\/ballers-play(?:-[a-z0-9-]+)?-mickeymosas-projects\.vercel\.app$/.test(origin) ||
+    origin === "https://ballers-play-mickeymosas-projects.vercel.app";
+  if(!validOrigin)return respond({error:"Origin not allowed"},403);
   if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{...headers,"Access-Control-Allow-Origin":origin}});
   if(req.method!=="POST")return respond({error:"Method not allowed"},405,origin);
   try{
