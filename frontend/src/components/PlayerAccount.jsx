@@ -64,7 +64,7 @@ export default function PlayerAccount() {
     <form className="bp-native-form" onSubmit={submit}>
       {mode==="signup" && <>
         <label>Full name<input required minLength={2} maxLength={120} autoComplete="name" value={form.full_name} onChange={e=>update("full_name",e.target.value)}/></label>
-        <label>Phone number (required, with country code)<input required type="tel" autoComplete="tel" placeholder="+48123456789" value={form.phone} onChange={e=>update("phone",e.target.value)} pattern="\\+[1-9][0-9]{7,14}" title="Use international format, e.g. +48123456789"/></label>
+        <label>Phone number (required, with country code)<input required type="tel" autoComplete="tel" placeholder="+48123456789" value={form.phone} onChange={e=>update("phone",e.target.value)} pattern="[+][1-9][0-9]{7,14}" title="Use international format, e.g. +48123456789"/></label>
       </>}
       <label>Email<input required type="email" autoComplete="email" value={form.email} onChange={e=>update("email",e.target.value)}/></label>
       {mode!=="reset" && <label>Password<input required type="password" autoComplete={mode==="signup"?"new-password":"current-password"} minLength={mode==="signup"?8:undefined} value={form.password} onChange={e=>update("password",e.target.value)}/></label>}
