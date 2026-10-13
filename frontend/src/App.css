@@ -684,3 +684,23 @@ header.nav.scrolled {
 @media(max-width:900px){.bp-audience-grid{grid-template-columns:1fr;gap:40px}.bp-organizer-grid .bp-photo{order:2}.bp-steps{grid-template-columns:1fr}.bp-photo{min-height:350px}}
 @media(max-width:600px){.bp .section{padding:78px 0}.bp-step{padding:28px;min-height:auto}.bp-audience-copy h2{font-size:clamp(2.7rem,11vw,4.5rem)}.bp-photo{min-height:280px}.bp .hero{min-height:650px}.bp .hero-actions .btn{width:100%}}
 @media(prefers-reduced-motion:reduce){.bp .reveal{opacity:1;transform:none;transition:none}.bp *{scroll-behavior:auto!important}}
+
+/* Supabase match discovery and protected admin */
+.bp-match-discovery{padding:96px 0;background:#080a08;color:#fff}
+.bp-match-discovery h2{font-size:clamp(2rem,4vw,3.5rem);margin:12px 0 32px}
+.bp-match-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.bp-match-card,.bp-admin-list article{padding:24px;border:1px solid rgba(198,255,0,.22);border-radius:16px;background:#141714}
+.bp-match-card h3{font-size:1.4rem;margin:12px 0}
+.bp-match-card p{margin:9px 0;color:#d0d0d0}
+.bp-match-format{color:#c6ff00;font-weight:700}
+.bp-admin-shell{min-height:100vh;background:#090b09;color:#fff;padding:80px 0}
+.bp-admin-panel{max-width:960px}
+.bp-admin-panel h1{font-size:clamp(2rem,5vw,3.5rem);margin:30px 0}
+.bp-admin-panel h2{margin:40px 0 18px}
+.bp-admin-back{color:#c6ff00}
+.bp-admin-login{max-width:420px;display:grid;gap:20px}
+.bp-admin-login label{display:grid;gap:8px}
+.bp-admin-login input{background:#191d19;border:1px solid #555;color:white;border-radius:8px;padding:14px;width:100%}
+.bp-admin-panel button{background:#c6ff00;color:#101510;border:0;border-radius:8px;padding:12px 20px;cursor:pointer;font-weight:700;margin:8px 12px 8px 0}
+.bp-admin-panel button:disabled{opacity:.5;cursor:not-allowed}
+.bp-admin-list{display:grid;gap:14px}
