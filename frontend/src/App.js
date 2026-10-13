@@ -70,7 +70,7 @@ export default function App() {
 
   const closeMenu = () => setMenuOpen(false);
 
-  if (window.location.pathname.replace(/\\/$/, "") === "/admin") return <AdminDashboard />;
+  if (window.location.pathname.replace(/\/$/, "") === "/admin") return <AdminDashboard />;
 
   return (
     <div className="bp" data-testid="ballersplay-page">
