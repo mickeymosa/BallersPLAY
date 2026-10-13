@@ -11,7 +11,7 @@ Deno.serve(async req=>{
     const authHeader=req.headers.get("authorization")||"";
     const token=authHeader.match(/^Bearer\s+([^\s]+)$/i)?.[1];
     if(!token)return respond({error:"Log in to request a spot."},401,origin);
-    const authClient=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_ANON_KEY")!,{auth:{persistSession:false}});
+    const authClient=createClient(Deno.env.get("SUPABASE_URL")!,(Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY"))!,{auth:{persistSession:false}});
     const {data:{user},error:authError}=await authClient.auth.getUser(token);
     if(authError||!user||!user.email)return respond({error:"Please log in again."},401,origin);
     const input=await req.json();
@@ -25,7 +25,7 @@ Deno.serve(async req=>{
       return respond({error:"Booking details must match your registered account."},400,origin);
     const {data:match,error:mErr}=await db.from("matches").select("id,starts_at").eq("id",match_id).eq("status","published").single();
     if(mErr||!match||Date.parse(match.starts_at)<Date.now())return respond({error:"This match is no longer available."},404,origin);
-    const {error}=await db.from("bookings").insert({match_id,player_name,player_email,player_phone:player_phone||null,status:"requested"});
+    const {error}=await db.from("bookings").insert({match_id,player_id:user.id,player_name,player_email,player_phone,status:"requested"});
     if(error?.code==="23505")return respond({error:"You already have an active request for this match."},409,origin);
     if(error)throw error;
     return respond({ok:true,message:"Request received. Your spot is not confirmed yet."},201,origin);
