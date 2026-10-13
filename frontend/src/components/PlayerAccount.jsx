@@ -8,6 +8,7 @@ export default function PlayerAccount() {
   const [profile, setProfile] = useState(null);
   const [mode, setMode] = useState("signup");
   const [recovery, setRecovery] = useState(false);
+  const [profileForm, setProfileForm] = useState({full_name:"",phone:""});
   const [form, setForm] = useState({ full_name: "", phone: "", email: "", password: "", confirm: "" });
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
@@ -20,7 +21,7 @@ export default function PlayerAccount() {
   useEffect(() => {
     if (!user || !supabase) { setProfile(null); return; }
     supabase.from("player_profiles").select("full_name,phone").eq("id",user.id).maybeSingle()
-      .then(({data,error}) => { if (!error) setProfile(data); });
+      .then(({data,error}) => { if (!error) { setProfile(data); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
   }, [user]);
   const update = (key, value) => setForm(prev => ({...prev,[key]:value}));
   async function submit(event) {
@@ -53,6 +54,29 @@ export default function PlayerAccount() {
     } catch (error) {setNotice(error.message || "Something went wrong.");}
     finally {setBusy(false);}
   }
+  async function googleLogin() {
+    if (!supabase) return setNotice("Account service is not configured.");
+    setNotice("");
+    const {error} = await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin+"/account"}});
+    if (error) setNotice(error.message);
+  }
+  async function saveProfile(event) {
+    event.preventDefault();
+    if (!validPhone(profileForm.phone.trim()) || profileForm.full_name.trim().length < 2) {
+      setNotice("Enter your name and a valid international phone number."); return;
+    }
+    setBusy(true); setNotice("");
+    const {error} = await supabase.rpc("ballersplay_complete_player_profile",{
+      p_full_name:profileForm.full_name.trim(),p_phone:profileForm.phone.trim()
+    });
+    if (error) setNotice(error.message);
+    else {
+      const {data} = await supabase.from("player_profiles").select("full_name,phone").eq("id",user.id).maybeSingle();
+      setProfile(data);
+      setNotice("Your account is ready to book.");
+    }
+    setBusy(false);
+  }
   async function changePassword(event) {
     event.preventDefault();
     if (form.password.length < 8 || form.password !== form.confirm) return setNotice("Password must be at least 8 characters and both entries must match.");
@@ -70,7 +94,14 @@ export default function PlayerAccount() {
     </form></section>;
   if (user) return <section className="bp-account-panel">
     <h1>My BallersPlay account</h1><p>Signed in as {user.email}</p>
-    {profile ? <p>{profile.full_name} · {profile.phone}</p> : <p>Profile not found. Contact support before booking.</p>}
+    {profile ? <p>{profile.full_name} · {profile.phone}</p> :
+      <form className="bp-native-form" onSubmit={saveProfile}>
+        <p>Complete your profile to book matches. A phone number is required, including for Google sign-in.</p>
+        <label>Full name<input required minLength={2} maxLength={120} value={profileForm.full_name} onChange={e=>setProfileForm(p=>({...p,full_name:e.target.value}))}/></label>
+        <label>Phone number<input type="tel" required placeholder="+48123456789" pattern="[+][1-9][0-9]{7,14}" value={profileForm.phone} onChange={e=>setProfileForm(p=>({...p,phone:e.target.value}))}/></label>
+        <button disabled={busy}>Save profile</button>
+      </form>}
+    {notice && <p role="status">{notice}</p>}
     <div className="bp-account-actions"><a href="/matches" className="btn btn-primary">Find matches</a>
     <button onClick={() => supabase.auth.signOut()}>Sign out</button></div>
   </section>;
@@ -88,6 +119,7 @@ export default function PlayerAccount() {
       <button disabled={busy}>{busy?"Please wait…":mode==="signup"?"Create account":mode==="login"?"Log in":"Send reset email"}</button>
       {notice && <p role="status">{notice}</p>}
     </form>
+    <div className="bp-google-signin"><button type="button" onClick={googleLogin}>Continue with Google</button></div>
     <div className="bp-account-actions">
       {mode!=="signup" && <button type="button" onClick={()=>{setMode("signup");setNotice("");}}>Create account</button>}
       {mode!=="login" && <button type="button" onClick={()=>{setMode("login");setNotice("");}}>Log in</button>}
