@@ -1,6 +1,26 @@
 {
   "rewrites": [
     {
+      "source": "/account",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/profile",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/matches",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/organize",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
       "source": "/((?!static/|assets/|favicon.ico|manifest.json|robots.txt|LogoEnhanced2.png).*)",
       "destination": "/index.html"
     }
