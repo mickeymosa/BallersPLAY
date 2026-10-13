@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import FootballAvatar from "./FootballAvatar";
+import FootballAvatar,{avatarPreset} from "./FootballAvatar";
+import AvatarCustomizer from "./AvatarCustomizer";
 
 const AVATARS = {striker:"⚽",keeper:"🧤",captain:"🏆",playmaker:"🎯",defender:"🛡️",speedster:"⚡"};
 const validPhone = (value) => /^\+[1-9]\d{7,14}$/.test(value);
@@ -46,7 +47,7 @@ export default function PlayerAccount() {
   useEffect(() => {
     if (!user || !supabase) { setProfile(null); setProfileLoading(false); return; }
     setProfileLoading(true);
-    supabase.from("player_profiles").select("full_name,phone,username,avatar_key,avatar_path,is_verified").eq("id",user.id).maybeSingle()
+    supabase.from("player_profiles").select("full_name,phone,username,avatar_key,avatar_path,avatar_config,is_verified").eq("id",user.id).maybeSingle()
       .then(({data,error}) => { setProfileLoading(false); if (error) setNotice("Could not load your profile: "+error.message); if (!error) { setProfile(data); setUsernameInput(data?.username || ""); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
   }, [user]);
   useEffect(() => {
@@ -67,13 +68,15 @@ export default function PlayerAccount() {
     }
     setBusy(false);
   }
-  async function selectAvatar(key) {
-    if (!profile) return;
+  async function saveCustomizedAvatar(key, config) {
+    if (!profile || !user) return false;
     setAvatarBusy(true);setNotice("");
-    const {error}=await supabase.from("player_profiles").update({avatar_key:key,avatar_path:null,updated_at:new Date().toISOString()}).eq("id",user.id);
-    if (error) setNotice(error.message);
-    else setProfile(p=>({...p,avatar_key:key,avatar_path:null}));
-    setAvatarBusy(false);
+    const {error}=await supabase.from("player_profiles").update({
+      avatar_key:key,avatar_config:config,avatar_path:null,updated_at:new Date().toISOString()
+    }).eq("id",user.id);
+    if(error){setNotice("Avatar could not be saved: "+error.message);setAvatarBusy(false);return false;}
+    setProfile(p=>({...p,avatar_key:key,avatar_config:config,avatar_path:null}));
+    setAvatarBusy(false);return true;
   }
   async function uploadAvatar(event) {
     const file=event.target.files?.[0];
@@ -191,7 +194,7 @@ export default function PlayerAccount() {
       </form>}
     {profile && <div className="bp-profile-features">
       <div className="bp-profile-hero">
-        <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile avatar"/>:<FootballAvatar variant={profile.avatar_key} size={86}/>}</div>
+        <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile avatar"/>:<FootballAvatar variant={profile.avatar_key} config={profile.avatar_config&&Object.keys(profile.avatar_config).length?profile.avatar_config:avatarPreset(profile.avatar_key)} size={86}/>}</div>
         <div><h2>{profile.full_name}</h2><p>{profile.username?"@"+profile.username:"Choose a username below"}</p>
         <p>{profile.is_verified?"✓ Verified by BallersPlay":"Account not yet verified"}</p></div>
       </div>
@@ -212,8 +215,7 @@ export default function PlayerAccount() {
         <label>Comment (optional)<textarea maxLength={500} rows={3} value={reviewComment} onChange={e=>setReviewComment(e.target.value)}/></label>
         <button disabled={busy}>Submit review</button>
       </form> : <p>You can review teammates after a match is marked completed and both players have confirmed bookings.</p>}
-      <h2>Choose your football avatar</h2>
-      <div className="bp-avatar-choices">{Object.entries(AVATARS).map(([key,emoji])=><button type="button" key={key} disabled={avatarBusy} className={profile.avatar_key===key&&!profile.avatar_path?"selected":""} onClick={()=>selectAvatar(key)} title={key} aria-label={"Use "+key+" avatar"}><FootballAvatar variant={key} size={46}/></button>)}</div>
+      <AvatarCustomizer profile={profile} onSave={saveCustomizedAvatar} busy={avatarBusy}/>
       <label className="bp-upload-label">Or upload your own profile photo (JPG, PNG or WebP, max 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={uploadAvatar}/></label>
       <h2>Player profile</h2>
       <p>Your username is your public identity. Other players can use it to find you later.</p>
