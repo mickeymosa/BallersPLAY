@@ -876,3 +876,14 @@ header.nav.scrolled {
 .bp-player-card__portrait img.bp-player-card__chibi{width:92%;height:94%;object-fit:cover;border-radius:12px;mix-blend-mode:multiply}
 @media(max-width:1050px){.bp-chibi-editor{grid-template-columns:1fr}.bp-chibi-gallery{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(max-width:570px){.bp-chibi-editor{padding:12px}.bp-chibi-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.bp-chibi-tabs button{padding:8px 10px;font-size:.8rem}}
+
+/* Full-screen cinematic authentication, same cover treatment as the landing hero */
+.bp-auth-fullscreen{position:relative;isolation:isolate;min-height:calc(100svh - 76px);width:100%;display:flex;align-items:center;justify-content:center;padding:clamp(28px,5vw,72px) 18px;overflow:hidden;background:#071018}
+.bp-auth-video-layer{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.bp-auth-video-layer video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
+.bp-auth-backdrop{position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(2,10,17,.78),rgba(2,10,17,.48) 48%,rgba(2,10,17,.76)),linear-gradient(0deg,rgba(2,10,17,.65),transparent 40%)}
+.bp-auth-glass-form{position:relative;z-index:1;width:min(100%,480px)!important;max-width:480px!important;margin:0!important;padding:clamp(24px,4vw,42px)!important;border:1px solid rgba(255,255,255,.2)!important;border-radius:22px!important;background:rgba(8,18,27,.79)!important;box-shadow:0 20px 65px rgba(0,0,0,.5)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff}
+.bp-auth-glass-form h1,.bp-auth-glass-form p,.bp-auth-glass-form label{color:#fff}
+.bp-auth-glass-form input{background:#e9f0ff;color:#15212c}
+@media(max-width:650px){.bp-auth-fullscreen{min-height:calc(100svh - 65px);padding:24px 12px}.bp-auth-glass-form{padding:24px 18px!important}.bp-auth-video-layer video{object-position:center center}}
+@media(prefers-reduced-motion:reduce){.bp-auth-video-layer video{display:none}.bp-auth-fullscreen{background:linear-gradient(135deg,#0b2232,#10291f)}}
