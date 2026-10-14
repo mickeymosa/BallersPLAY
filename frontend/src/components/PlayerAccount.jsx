@@ -246,7 +246,15 @@ export default function PlayerAccount() {
     <div className="bp-account-actions"><a href="/matches" className="btn btn-primary">Find matches</a>
     <button onClick={() => supabase.auth.signOut()}>Sign out</button></div>
   </section>;
-  return <section className="bp-account-login-layout">\n    <div className="bp-account-video" aria-hidden="true"><video autoPlay muted loop playsInline preload="metadata" poster="/LogoEnhanced2.png"><source src="/signin-bg.mp4" type="video/mp4"/></video><div className="bp-account-video-shade"/><div className="bp-account-video-caption"><span>BALLERSPLAY</span><strong>YOUR STORY STARTS HERE.</strong></div></div>\n    <div className="bp-account-panel bp-account-login-form">
+  return <section className="bp-auth-fullscreen">
+    <div className="bp-auth-video-layer" aria-hidden="true">
+      <video autoPlay muted loop playsInline preload="auto" poster="/LogoEnhanced2.png">
+        <source src="/signin-bg.mp4" type="video/mp4"/>
+        <source src="https://customer-assets.emergentagent.com/job_ba99f296-f872-493d-ac5a-68fd843b5323/artifacts/y2g5eoch_A_cinematic%2C_high-contrast_animation_based_on_a_white_silhouette_logo_of_a_soccer_player_on_a_solid__seed1924638786.mp4" type="video/mp4"/>
+      </video>
+    </div>
+    <div className="bp-auth-backdrop" aria-hidden="true"/>
+    <div className="bp-account-panel bp-auth-glass-form">
     <h1>{mode==="signup"?"Create an account":mode==="login"?"Log in":"Reset password"}</h1>
     <p>Register to request a place in a football match.</p>
     <form className="bp-native-form" onSubmit={submit}>
