@@ -246,7 +246,7 @@ export default function PlayerAccount() {
     <div className="bp-account-actions"><a href="/matches" className="btn btn-primary">Find matches</a>
     <button onClick={() => supabase.auth.signOut()}>Sign out</button></div>
   </section>;
-  return <section className="bp-account-panel">
+  return <section className="bp-account-login-layout">\n    <div className="bp-account-video" aria-hidden="true"><video autoPlay muted loop playsInline preload="metadata" poster="/LogoEnhanced2.png"><source src="/signin-bg.mp4" type="video/mp4"/></video><div className="bp-account-video-shade"/><div className="bp-account-video-caption"><span>BALLERSPLAY</span><strong>YOUR STORY STARTS HERE.</strong></div></div>\n    <div className="bp-account-panel bp-account-login-form">
     <h1>{mode==="signup"?"Create an account":mode==="login"?"Log in":"Reset password"}</h1>
     <p>Register to request a place in a football match.</p>
     <form className="bp-native-form" onSubmit={submit}>
