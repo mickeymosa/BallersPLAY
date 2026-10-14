@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, getRememberLogin, setRememberLogin } from "../lib/supabase";
 import FootballAvatar,{avatarPreset} from "./FootballAvatar";
 import AvatarCustomizer from "./AvatarCustomizer";
 import PlayerCard from "./PlayerCard";
@@ -26,6 +26,7 @@ export default function PlayerAccount() {
   const [foundPlayer, setFoundPlayer] = useState(null);
   const [searchNotice, setSearchNotice] = useState("");
   const [mode, setMode] = useState("signup");
+  const [remember,setRemember] = useState(getRememberLogin);
   const [recovery, setRecovery] = useState(false);
   const [profileForm, setProfileForm] = useState({full_name:"",phone:""});
   const [form, setForm] = useState({ full_name: "", phone: "", email: "", password: "", confirm: "" });
@@ -251,7 +252,6 @@ export default function PlayerAccount() {
     <div className="bp-auth-video-layer" aria-hidden="true">
       <video autoPlay muted loop playsInline preload="auto" poster="/LogoEnhanced2.png">
         <source src="/signin-bg.mp4" type="video/mp4"/>
-        <source src="https://customer-assets.emergentagent.com/job_ba99f296-f872-493d-ac5a-68fd843b5323/artifacts/y2g5eoch_A_cinematic%2C_high-contrast_animation_based_on_a_white_silhouette_logo_of_a_soccer_player_on_a_solid__seed1924638786.mp4" type="video/mp4"/>
       </video>
     </div>
     <div className="bp-auth-backdrop" aria-hidden="true"/>
@@ -266,6 +266,7 @@ export default function PlayerAccount() {
       <label>Email<input required type="email" autoComplete="email" value={form.email} onChange={e=>update("email",e.target.value)}/></label>
       {mode!=="reset" && <label>Password<input required type="password" autoComplete={mode==="signup"?"new-password":"current-password"} minLength={mode==="signup"?8:undefined} value={form.password} onChange={e=>update("password",e.target.value)}/></label>}
       {mode==="signup" && <label>Confirm password<input required type="password" autoComplete="new-password" value={form.confirm} onChange={e=>update("confirm",e.target.value)}/></label>}
+      {mode!=="reset" && <label className="bp-remember-option"><input type="checkbox" checked={remember} onChange={e=>{setRemember(e.target.checked);setRememberLogin(e.target.checked);}}/><span>Stay logged in on this device</span></label>}
       <button disabled={busy}>{busy?"Please wait…":mode==="signup"?"Create account":mode==="login"?"Log in":"Send reset email"}</button>
       {notice && <p role="status">{notice}</p>}
     </form>
