@@ -266,5 +266,6 @@ export default function PlayerAccount() {
       {mode!=="login" && <button type="button" onClick={()=>{setMode("login");setNotice("");}}>Log in</button>}
       {mode!=="reset" && <button type="button" onClick={()=>{setMode("reset");setNotice("");}}>Forgot password?</button>}
     </div>
+    </div>
   </section>;
-}    </div>\n
+}
