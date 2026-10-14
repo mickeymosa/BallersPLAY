@@ -834,3 +834,45 @@ header.nav.scrolled {
 .bp-attendance-check input{width:18px;height:18px}
 .bp-finish-match{margin-top:12px}
 .bp-finish-match:disabled{opacity:.45;cursor:not-allowed}
+
+/* Cinematic sign-in */
+.bp-account-login-layout{width:min(1240px,calc(100% - 32px));margin:35px auto 70px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);min-height:620px;border:1px solid #293a4b;border-radius:24px;overflow:hidden;background:#101a24;box-shadow:0 20px 65px #0006}
+.bp-account-video{position:relative;min-height:620px;overflow:hidden;background:radial-gradient(circle at 45% 45%,#354539,#081018 70%)}
+.bp-account-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bp-account-video-shade{position:absolute;inset:0;background:linear-gradient(0deg,#050d14e8,transparent 45%,#030a1270)}
+.bp-account-video-caption{position:absolute;bottom:45px;left:35px;right:25px;color:#fff;display:grid;gap:10px}
+.bp-account-video-caption span{font-size:.85rem;letter-spacing:.3em;color:#c6ff00;font-weight:900}
+.bp-account-video-caption strong{font-size:clamp(1.7rem,3.3vw,3.1rem);line-height:1.05}
+.bp-account-login-form{width:auto!important;max-width:none!important;margin:0!important;border:0!important;border-radius:0!important;display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,3vw,50px)!important}
+@media(max-width:780px){.bp-account-login-layout{grid-template-columns:1fr;margin-top:16px}.bp-account-video{min-height:220px}.bp-account-video-caption{bottom:20px;left:22px}.bp-account-video-caption strong{font-size:1.5rem}.bp-account-login-form{padding:22px!important}}
+/* Chibi footballer character selection */
+.bp-chibi-editor{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.95fr);gap:20px;margin:24px 0;padding:20px;background:#08131d;color:#f6f9ff;border:1px solid #263647;border-radius:22px}
+.bp-chibi-heading{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.bp-chibi-heading h2{margin:0;font-size:clamp(1.4rem,2.6vw,2.2rem)}
+.bp-chibi-tabs{display:flex;gap:7px;flex-wrap:wrap}
+.bp-chibi-tabs button{background:#1d2b39;color:#f4f7fc;border:0;border-radius:25px;padding:10px 14px;cursor:pointer;font-weight:700}
+.bp-chibi-tabs button.active{background:#c6ff00;color:#0a1600}
+.bp-chibi-gallery{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.bp-chibi-tile{aspect-ratio:170/144;min-width:0;overflow:hidden;background:linear-gradient(140deg,#28394a,#101d29);border:2px solid #35485b;border-radius:15px;padding:0;cursor:pointer}
+.bp-chibi-tile.active{border-color:#c6ff00;box-shadow:0 0 0 2px #c6ff0066}
+.bp-chibi-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.bp-chibi-sidebar{display:grid;gap:12px;align-content:start;min-width:0}
+.bp-chibi-hero{aspect-ratio:1.15;display:flex;justify-content:center;align-items:center;overflow:hidden;border-radius:17px;background:radial-gradient(circle at 50% 90%,#3d742f,#174b44 32%,#173451 65%,#527caf)}
+.bp-chibi-hero img{width:75%;height:85%;object-fit:contain;image-rendering:auto;filter:drop-shadow(0 10px 10px #0008);border-radius:16px}
+.bp-chibi-persona{padding:16px;border:1px solid #2c3e4f;border-radius:15px}
+.bp-chibi-player-row{display:flex;align-items:center;justify-content:space-between}
+.bp-chibi-player-row strong{font-size:1.3rem}
+.bp-chibi-player-row p{color:#aebcca;margin:5px 0}
+.bp-chibi-subtitle{font-size:.8rem;color:#aebcca;margin:15px 0 10px}
+.bp-chibi-swatches{display:flex;flex-wrap:wrap;gap:10px}
+.bp-chibi-swatches button{width:32px;height:32px;border-radius:50%;border:2px solid #8995a0;cursor:pointer}
+.bp-chibi-swatches button.active{outline:2px solid #c6ff00;outline-offset:2px}
+.bp-chibi-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bp-chibi-buttons button{border:0;border-radius:12px;padding:14px 10px;font-weight:900;cursor:pointer;background:#2b3b49;color:#fff}
+.bp-chibi-buttons button:last-child{background:#c6ff00;color:#101900}
+.bp-chibi-buttons button:disabled{opacity:.5}
+.bp-chibi-card{display:grid;justify-items:center;gap:12px;padding-top:10px}
+.bp-chibi-card h3{margin:0}
+.bp-player-card__portrait img.bp-player-card__chibi{width:92%;height:94%;object-fit:cover;border-radius:12px;mix-blend-mode:multiply}
+@media(max-width:1050px){.bp-chibi-editor{grid-template-columns:1fr}.bp-chibi-gallery{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:570px){.bp-chibi-editor{padding:12px}.bp-chibi-gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.bp-chibi-tabs button{padding:8px 10px;font-size:.8rem}}
