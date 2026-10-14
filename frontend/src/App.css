@@ -887,3 +887,13 @@ header.nav.scrolled {
 .bp-auth-glass-form input{background:#e9f0ff;color:#15212c}
 @media(max-width:650px){.bp-auth-fullscreen{min-height:calc(100svh - 65px);padding:24px 12px}.bp-auth-glass-form{padding:24px 18px!important}.bp-auth-video-layer video{object-position:center center}}
 @media(prefers-reduced-motion:reduce){.bp-auth-video-layer video{display:none}.bp-auth-fullscreen{background:linear-gradient(135deg,#0b2232,#10291f)}}
+
+/* Sign-in: full hero viewport with video behind translucent form */
+.bp-auth-fullscreen{min-height:100svh;min-height:100dvh;margin:0!important;max-width:none!important;padding:clamp(70px,8vh,110px) 18px 48px!important;background:#071018;position:relative;isolation:isolate}
+.bp-auth-video-layer{z-index:0!important}
+.bp-auth-video-layer video{width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.bp-auth-backdrop{z-index:1!important;background:linear-gradient(90deg,rgba(3,9,16,.43),rgba(3,9,16,.28) 48%,rgba(3,9,16,.43))!important}
+.bp-auth-glass-form{z-index:2!important;background:rgba(9,18,27,.62)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.25)!important}
+.bp-remember-option{display:flex!important;flex-direction:row!important;align-items:center!important;gap:10px!important;margin:8px 0 14px;color:#f7f9ff;font-size:.92rem;cursor:pointer}
+.bp-remember-option input{width:18px!important;height:18px!important;flex:0 0 18px;accent-color:#c6ff00}
+@media(max-width:650px){.bp-auth-fullscreen{padding:82px 12px 30px!important;min-height:100dvh}.bp-auth-glass-form{background:rgba(9,18,27,.72)!important}}
