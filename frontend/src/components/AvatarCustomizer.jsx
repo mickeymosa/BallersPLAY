@@ -1,5 +1,6 @@
 import {useEffect,useMemo,useState} from "react";
 import PlayerCard from "./PlayerCard";
+import AvatarPortrait from "./AvatarPortrait";
 import {CHIBI_CHARACTERS,CHIBI_CATEGORIES} from "./chibiCatalog";
 import {avatarPreset,sanitizeAvatar} from "./FootballAvatar";
 
@@ -28,11 +29,11 @@ export default function AvatarCustomizer({profile,stats,onSave,busy=false}){
     <div className="bp-chibi-tabs" role="group" aria-label="Avatar categories">{CHIBI_CATEGORIES.map(c=><button key={c} type="button" className={category===c?"active":""} aria-pressed={category===c} onClick={()=>setCategory(c)}>{c}</button>)}</div>
    </div>
    <div className="bp-chibi-gallery">{visible.map(c=><button type="button" key={c.id} title={c.name} aria-label={"Select "+c.name} aria-pressed={character===c.id} className={"bp-chibi-tile"+(character===c.id?" active":"")} onClick={()=>choose(c.id)}>
-    <img src={c.image} alt={c.name} loading="lazy" onError={e=>{e.currentTarget.style.visibility="hidden";}}/>
+    <AvatarPortrait id={c.id} config={draft} alt={c.name} size={108}/>
    </button>)}</div>
   </div>
   <aside className="bp-chibi-sidebar">
-   <div className="bp-chibi-hero"><img src={CHIBI_CHARACTERS.find(c=>c.id===character)?.image} alt="Selected football character" onError={e=>{e.currentTarget.style.visibility="hidden";}}/></div>
+   <div className="bp-chibi-hero"><AvatarPortrait id={character} config={draft} alt="Selected football character" size={260} loading="eager"/></div>
    <div className="bp-chibi-persona">
     <div className="bp-chibi-player-row"><div><strong>{profile.full_name||"Your Player"}</strong><p>{profile.username?"@"+profile.username:"Choose a username in your profile"}</p></div><span>⚽</span></div>
     <p className="bp-chibi-subtitle">Choose your player card accent</p>
