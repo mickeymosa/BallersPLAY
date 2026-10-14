@@ -267,4 +267,4 @@ export default function PlayerAccount() {
       {mode!=="reset" && <button type="button" onClick={()=>{setMode("reset");setNotice("");}}>Forgot password?</button>}
     </div>
   </section>;
-}
+}    </div>\n
