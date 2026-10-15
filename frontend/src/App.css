@@ -925,3 +925,20 @@ header.nav.scrolled {
 .bp-barq-compose button:disabled{opacity:.45;cursor:wait}
 .bp-barq-disclaimer{padding:0 12px 12px;background:#14232f;color:#adc0ca;font-size:.66rem;line-height:1.45;margin:0}
 @media(max-width:480px){.bp-barq-shell{right:12px;bottom:12px}.bp-barq-window{width:calc(100vw - 24px);height:min(630px,calc(100dvh - 95px));bottom:60px}.bp-barq-launcher{padding:10px 15px}}
+
+/* BallersPlay 2005 Edition – mature football-game portrait direction */
+.bp-chibi-editor{background:radial-gradient(ellipse at 100% 0%,rgba(24,61,86,.48),transparent 53%),linear-gradient(160deg,#071523,#050d16);border-color:#31485a;box-shadow:0 16px 38px rgba(0,0,0,.25)}
+.bp-chibi-heading h2{font-family:Montserrat,system-ui,sans-serif;font-weight:900;letter-spacing:-.045em;text-transform:uppercase}
+.bp-chibi-tile{aspect-ratio:4/5;background:linear-gradient(135deg,#2a445b,#101d2b);border:1px solid #38516a;border-radius:7px;transition:border-color .15s,transform .15s,box-shadow .15s}
+.bp-chibi-tile:hover{transform:translateY(-2px);border-color:#a7c8e7}
+.bp-chibi-tile.active{border:2px solid #c6ff00;box-shadow:inset 0 0 0 1px #c6ff0088,0 0 16px #c6ff0028}
+.bp-chibi-tile .bp-avatar-portrait svg{width:100%;height:100%;object-fit:cover}
+.bp-chibi-hero{aspect-ratio:4/4.1;border-radius:8px;background:#0c1f31;border:1px solid #45617b;box-shadow:inset 0 -25px 30px #06101a66}
+.bp-chibi-hero .bp-avatar-portrait{height:100%;width:100%}
+.bp-chibi-hero .bp-avatar-portrait svg{width:100%;height:100%}
+.bp-chibi-persona{background:#0a1929;border-color:#294762}
+.bp-chibi-tabs button{border-radius:6px;text-transform:uppercase;letter-spacing:.04em;font-size:.74rem}
+.bp-chibi-buttons button{border-radius:7px;text-transform:uppercase;letter-spacing:.025em}
+.bp-player-card__portrait .bp-avatar-portrait{border-radius:5px;mask-image:linear-gradient(to bottom,black 68%,transparent 99%)}
+.bp-player-card__portrait .bp-avatar-portrait svg{width:100%;height:100%;object-fit:cover}
+.bp-avatar-preview .bp-avatar-portrait svg{width:100%;height:100%;object-fit:cover}
