@@ -39,7 +39,28 @@ Deno.serve(async(req:Request)=>{
   const history=raw.filter((m:any)=>m&&["user","assistant"].includes(m.role)&&typeof m.content==="string")
    .map((m:any)=>({role:m.role,content:m.content.slice(0,650)}));
   const key=Deno.env.get("OPENAI_API_KEY");
-  if(key){
+  const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const supabaseUrl=Deno.env.get("SUPABASE_URL");
+  if(key && serviceKey && supabaseUrl){
+   // Enforce per-source hourly quota before making a paid AI API call.
+   // No raw IP address is stored in the database.
+   const clientAddress=(req.headers.get("cf-connecting-ip")||req.headers.get("x-forwarded-for")||"unknown").split(",")[0].trim().slice(0,100);
+   const salt=Deno.env.get("BARQ_RATE_LIMIT_SALT")||serviceKey;
+   const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(salt+":"+clientAddress));
+   const bucket=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,"0")).join("");
+   try{
+    const limited=await fetch(supabaseUrl+"/rest/v1/rpc/barq_consume_request",{
+      method:"POST",headers:{"Content-Type":"application/json","apikey":serviceKey,"Authorization":"Bearer "+serviceKey},
+      body:JSON.stringify({p_bucket:bucket}),signal:AbortSignal.timeout(3500)
+    });
+    if(!limited.ok||await limited.json()!==true){
+      const response=fallback(message);
+      response.reply="I'm using quick help right now. "+response.reply;
+      return new Response(JSON.stringify(response),{headers:corsHeaders(origin)});
+    }
+   }catch{
+    return new Response(JSON.stringify(fallback(message)),{headers:corsHeaders(origin)});
+   }
    try{
     const response=await fetch("https://api.openai.com/v1/chat/completions",{
      method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},
