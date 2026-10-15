@@ -1,8 +1,12 @@
-import React from "react";
+import React,{useEffect,useState} from "react";
+import {chibiImage} from "./chibiCatalog";
 
 // Original late-2000s-era football-game portrait aesthetic.
 // Vector portraits ship with the app: no broken external image assets.
 export default function AvatarPortrait({id="chibi-01",config={},size=150,className="",alt="Footballer portrait"}){
+ const [failed,setFailed]=useState(false);
+ const asset=chibiImage(id)||chibiImage("chibi-01");
+ useEffect(()=>setFailed(false),[asset]);
  const n=Math.max(0,Math.min(29,(parseInt(String(id).split("-")[1],10)||1)-1));
  const skins=["#d9a078","#a96745","#f0c4a1","#78452e","#c58b64","#9e603e"];
  const hairs=["#241a17","#30241e","#ae7844","#171b22","#51352c","#e1b66e","#452718","#242324"];
@@ -21,6 +25,7 @@ export default function AvatarPortrait({id="chibi-01",config={},size=150,classNa
  highHair?"M62 76 L58 43 L66 25 L73 31 L82 15 L91 25 L106 11 L115 27 L129 21 L127 48 L133 72 Q114 47 95 50 Q75 48 62 76Z":
  "M62 77 Q52 40 77 24 Q105 11 125 35 L132 74 Q121 49 99 47 Q78 49 62 77Z";
  return <span className={"bp-avatar-portrait "+className} style={{display:"block",width:"100%",height:"100%",overflow:"hidden"}} role="img" aria-label={alt}>
+ {!failed && asset ? <img src={asset} alt="" loading="lazy" onError={()=>setFailed(true)} style={{display:"block",width:"100%",height:"100%",objectFit:"cover",objectPosition:"50% 28%"}}/> :
  <svg width={size} height={size} viewBox="0 0 190 192" preserveAspectRatio="xMidYMid slice" style={{display:"block",width:"100%",height:"100%"}}>
  <defs>
   <radialGradient id={uid+"bg"} cx="52%" cy="22%" r="85%"><stop stopColor="#53789b"/><stop offset=".53" stopColor="#1d384f"/><stop offset="1" stopColor="#09131d"/></radialGradient>
@@ -48,5 +53,5 @@ export default function AvatarPortrait({id="chibi-01",config={},size=150,classNa
  <path d="M84 113 Q97 118 110 112" stroke="#623a30" strokeWidth="2" fill="none" strokeLinecap="round"/>
  {beard&&<><path d="M70 104 Q76 124 95 132 Q115 129 123 103 L115 118 Q94 140 78 117Z" fill={hair} opacity=".83"/><path d="M84 111 Q97 108 110 111" stroke={hair} strokeWidth="4" strokeLinecap="round"/></>}
  <path d="M130 0 L190 0 L190 192 L165 192 Q183 92 130 0" fill="#071321" opacity=".14"/>
- </svg></span>;
+ </svg>}</span>;
 }
