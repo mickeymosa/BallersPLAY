@@ -1,6 +1,5 @@
 import React from "react";
-import FootballAvatar,{avatarPreset} from "./FootballAvatar";
-import {chibiImage} from "./chibiCatalog";
+import {avatarPreset} from "./FootballAvatar";
 import AvatarPortrait from "./AvatarPortrait";
 
 export function ratingForGames(games=0){return Math.min(99,60+2*Math.max(0,Math.floor(Number(games)||0)));}
@@ -16,7 +15,7 @@ export default function PlayerCard({profile,stats,config,preview=false}){
   <div className="bp-player-card__ornament" aria-hidden="true">✦</div>
   <div className="bp-player-card__top"><div className="bp-player-card__overall"><strong>{rating}</strong><span>OVR</span><span className="bp-player-card__tier">{tier}</span></div>
   <div className="bp-player-card__brand">BP<span>★</span></div></div>
-  <div className="bp-player-card__portrait">{chibiImage(avatarConfig?.chibiId)?<AvatarPortrait className="bp-player-card__chibi" id={avatarConfig.chibiId} config={avatarConfig} variant={profile?.avatar_key||"striker"} size={230} alt="Player character"/>:<FootballAvatar variant={profile?.avatar_key||"striker"} config={avatarConfig} size={230}/>}</div>
+  <div className="bp-player-card__portrait"><AvatarPortrait className="bp-player-card__chibi" id={avatarConfig?.chibiId||"chibi-01"} config={avatarConfig} variant={profile?.avatar_key||"striker"} size={230} alt="Footballer portrait"/></div>
   <div className="bp-player-card__footer"><strong title={name}>{name}</strong><span>{handle}</span>
   <div className="bp-player-card__line"/>
   <div className="bp-player-card__numbers"><span>⚽ {games} GAMES</span><span>★ {stats?.average_rating??"—"} REVIEWS</span></div>
