@@ -1014,3 +1014,6 @@ header.nav.scrolled {
  .bp-player-card__attribute strong{font-size:1rem}
  .bp-player-card__attribute span{font-size:.5rem}
 }
+
+/* Preserve the white logo artwork without its dark square background. */
+.bp-player-card__brand img{mix-blend-mode:screen}
