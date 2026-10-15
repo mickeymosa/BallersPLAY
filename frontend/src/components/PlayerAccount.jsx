@@ -201,7 +201,7 @@ export default function PlayerAccount() {
     {profile && <div className="bp-profile-features">
       <div className="bp-profile-card-feature"><PlayerCard profile={profile} stats={{...stats,...cardStats}}/></div>
       <div className="bp-profile-hero">
-        <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile avatar"/>:chibiImage(profile.avatar_config?.chibiId)?<AvatarPortrait id={profile.avatar_config.chibiId} config={profile.avatar_config} variant={profile.avatar_key} size={86} alt="Your chosen football character"/>:<FootballAvatar variant={profile.avatar_key} config={profile.avatar_config&&Object.keys(profile.avatar_config).length?profile.avatar_config:avatarPreset(profile.avatar_key)} size={86}/>}</div>
+        <div className="bp-avatar-preview">{avatarUrl?<img src={avatarUrl} alt="Your profile photo"/>:<AvatarPortrait id={profile.avatar_config?.chibiId||"chibi-01"} config={profile.avatar_config||{}} size={86} alt="Your footballer portrait"/>}</div>
         <div><h2>{profile.full_name}</h2><p>{profile.username?"@"+profile.username:"Choose a username below"}</p>
         <p>{profile.is_verified?"✓ Verified by BallersPlay":"Account not yet verified"}</p></div>
       </div>
