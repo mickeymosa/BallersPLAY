@@ -897,3 +897,31 @@ header.nav.scrolled {
 .bp-remember-option{display:flex!important;flex-direction:row!important;align-items:center!important;gap:10px!important;margin:8px 0 14px;color:#f7f9ff;font-size:.92rem;cursor:pointer}
 .bp-remember-option input{width:18px!important;height:18px!important;flex:0 0 18px;accent-color:#c6ff00}
 @media(max-width:650px){.bp-auth-fullscreen{padding:82px 12px 30px!important;min-height:100dvh}.bp-auth-glass-form{background:rgba(9,18,27,.72)!important}}
+
+/* BARQ website assistance */
+.bp-visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.bp-barq-shell{position:fixed;right:clamp(12px,2.5vw,30px);bottom:clamp(12px,2.5vw,28px);z-index:2147480000;font-family:Montserrat,system-ui,sans-serif}
+.bp-barq-launcher{display:flex;gap:10px;align-items:center;justify-content:center;background:#c6ff00;color:#122000;border:2px solid #e2ff89;border-radius:999px;padding:12px 20px;box-shadow:0 8px 30px #0009;font:800 0.96rem Montserrat,system-ui,sans-serif;cursor:pointer}
+.bp-barq-launcher span{font-size:1.45rem}
+.bp-barq-window{position:absolute;right:0;bottom:68px;width:min(390px,calc(100vw - 24px));max-height:min(690px,calc(100dvh - 110px));height:min(600px,calc(100dvh - 110px));display:flex;flex-direction:column;background:#0f1923;color:#f6f9ff;border:1px solid #364b5c;border-radius:19px;box-shadow:0 20px 60px #000b;overflow:hidden}
+.bp-barq-header{display:flex;align-items:center;justify-content:space-between;background:#182a35;padding:14px 16px;border-bottom:1px solid #354957}
+.bp-barq-identity{display:flex;gap:12px;align-items:center}
+.bp-barq-logo{width:42px;height:42px;border-radius:13px;background:#c6ff00;display:grid;place-items:center;font-size:1.3rem;color:#162200}
+.bp-barq-identity strong{display:block;font-size:1.05rem;letter-spacing:.06em}
+.bp-barq-identity small{display:block;color:#b8c8d4;font-size:.74rem}
+.bp-barq-header>button{background:none;color:#eaf1f5;border:0;font-size:1.8rem;padding:1px 8px;cursor:pointer}
+.bp-barq-messages{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
+.bp-barq-message{max-width:92%;padding:11px 13px;border-radius:14px;background:#253746;align-self:flex-start;line-height:1.55;overflow-wrap:anywhere}
+.bp-barq-user{align-self:flex-end;background:#c6ff00;color:#192600}
+.bp-barq-message p{margin:4px 0 0;white-space:pre-wrap;font-size:.83rem;color:inherit}
+.bp-barq-speaker{font-size:.68rem;font-weight:900;letter-spacing:.05em;opacity:.8}
+.bp-barq-message a{display:inline-block;margin-top:8px;color:#c6ff00;text-decoration:underline;font-size:.82rem;font-weight:800}
+.bp-barq-typing,.bp-barq-error{font-size:.76rem;color:#adbed0;margin:0;padding:5px 13px}
+.bp-barq-suggestions{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid #25394a}
+.bp-barq-suggestions button{border:1px solid #486279;background:#203648;color:#eaf7fc;border-radius:16px;padding:7px 9px;font-size:.72rem;cursor:pointer}
+.bp-barq-compose{display:flex;gap:9px;align-items:center;padding:12px;border-top:1px solid #304454;background:#14232f;margin:0}
+.bp-barq-compose input{flex:1;min-width:0;background:#ecf3fd;color:#172638;border:0;border-radius:10px;padding:12px;font-size:.85rem;outline-offset:2px}
+.bp-barq-compose button{width:40px;height:40px;border:0;border-radius:10px;background:#c6ff00;color:#142100;font-size:1.2rem;cursor:pointer}
+.bp-barq-compose button:disabled{opacity:.45;cursor:wait}
+.bp-barq-disclaimer{padding:0 12px 12px;background:#14232f;color:#adc0ca;font-size:.66rem;line-height:1.45;margin:0}
+@media(max-width:480px){.bp-barq-shell{right:12px;bottom:12px}.bp-barq-window{width:calc(100vw - 24px);height:min(630px,calc(100dvh - 95px));bottom:60px}.bp-barq-launcher{padding:10px 15px}}
