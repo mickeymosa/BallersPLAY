@@ -6,6 +6,7 @@ import OrganizerSubmission from "./components/OrganizerSubmission";
 import OrganizerDashboard from "./components/OrganizerDashboard";
 import PlayerAccount from "./components/PlayerAccount";
 import AccountNav from "./components/AccountNav";
+import BarqChat from "./components/BarqChat";
 
 
 const REGISTER_URL = "https://tally.so/r/rjgQ9v";
@@ -74,7 +75,7 @@ export default function App() {
   const closeMenu = () => setMenuOpen(false);
 
   const page = window.location.pathname.replace(/\/$/, "") || "/";
-  if (page === "/admin") return <AdminDashboard />;
+  if (page === "/admin") return <><AdminDashboard /><BarqChat /></>;
   if (page === "/matches" || page === "/organize" || page === "/manage" || page === "/account" || page === "/profile") return (
     <div className="bp bp-inner-page">
       <header className="bp-inner-header"><div className="container bp-inner-nav">
@@ -83,6 +84,7 @@ export default function App() {
       </div></header>
       <main>{page === "/matches" ? <MatchDiscovery /> : (page === "/account" || page === "/profile") ? <PlayerAccount /> : page === "/manage" ? <OrganizerDashboard /> : <OrganizerSubmission />}</main>
       <footer className="bp-inner-footer"><div className="container">BallersPlay · Wrocław football community</div></footer>
+      <BarqChat />
     </div>
   );
 
@@ -248,6 +250,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      <BarqChat />
     </div>
   );
 }
