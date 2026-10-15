@@ -942,3 +942,13 @@ header.nav.scrolled {
 .bp-player-card__portrait .bp-avatar-portrait{border-radius:5px;mask-image:linear-gradient(to bottom,black 68%,transparent 99%)}
 .bp-player-card__portrait .bp-avatar-portrait svg{width:100%;height:100%;object-fit:cover}
 .bp-avatar-preview .bp-avatar-portrait svg{width:100%;height:100%;object-fit:cover}
+
+/* Production art: exact 4:5 image framing across picker, profile and card. */
+.bp-chibi-tile{aspect-ratio:4/5;overflow:hidden;padding:0!important}
+.bp-chibi-tile .bp-avatar-portrait,.bp-chibi-hero .bp-avatar-portrait{width:100%!important;height:100%!important}
+.bp-chibi-tile .bp-avatar-portrait img,.bp-chibi-hero .bp-avatar-portrait img{width:100%;height:100%;object-fit:cover;object-position:50% 28%;display:block}
+.bp-chibi-hero{aspect-ratio:4/5;overflow:hidden}
+.bp-player-card__portrait .bp-avatar-portrait img{width:100%;height:100%;object-fit:cover;object-position:50% 24%;mask-image:linear-gradient(to bottom,#000 70%,transparent 100%)}
+.bp-avatar-preview .bp-avatar-portrait img{width:100%;height:100%;object-fit:cover;object-position:center 25%}
+.bp-chibi-gallery{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:570px){.bp-chibi-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
