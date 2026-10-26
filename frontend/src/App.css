@@ -1017,3 +1017,33 @@ header.nav.scrolled {
 
 /* Preserve the white logo artwork without its dark square background. */
 .bp-player-card__brand img{mix-blend-mode:screen}
+
+
+/* Keep the cinematic loop correctly cropped on desktop, iPad and phones.
+   A video element's inline playback avoids forced fullscreen on iOS. */
+.bp .video-bg {
+  width:100%;
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+  background:#000;
+  pointer-events:none;
+}
+.bp .video-bg video {
+  display:block;
+  position:absolute;
+  inset:0;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  object-fit:cover;
+  object-position:center;
+  transform:none;
+  background:#000;
+}
+@supports not (height:100dvh) {
+  .bp .video-bg { height:100vh; }
+}
