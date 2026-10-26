@@ -1,0 +1,63 @@
+name: Prepare cinematic background loop
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/prepare-background-loop.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create-loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SOURCE_VIDEO: "https://customer-assets.emergentagent.com/job_ba99f296-f872-493d-ac5a-68fd843b5323/artifacts/y2g5eoch_A_cinematic%2C_high-contrast_animation_based_on_a_white_silhouette_logo_of_a_soccer_player_on_a_solid__seed1924638786.mp4"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Download existing BallersPLAY background
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ballers-loop frontend/public
+          curl --fail --location --retry 3 --retry-delay 3 --connect-timeout 15 --max-time 240 \
+            -o /tmp/ballers-loop/source.mp4 "$SOURCE_VIDEO"
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,duration -of default=noprint_wrappers=1 /tmp/ballers-loop/source.mp4
+
+      - name: Encode seamless forward and reverse playback
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/ballers-loop
+          ffmpeg -hide_banner -loglevel error -y -i source.mp4 \
+            -vf "fps=24,scale=960:540:force_original_aspect_ratio=decrease:force_divisible_by=2,setsar=1" \
+            -an -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p \
+            -profile:v baseline -level 3.1 -movflags +faststart forward.mp4
+          ffmpeg -hide_banner -loglevel error -y -i forward.mp4 \
+            -vf "reverse" -an -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p \
+            -profile:v baseline -level 3.1 reverse.mp4
+          printf "file 'forward.mp4'\nfile 'reverse.mp4'\n" > concat.txt
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i concat.txt \
+            -c copy -movflags +faststart "$GITHUB_WORKSPACE/frontend/public/ballers-background-pingpong.mp4"
+          ffmpeg -hide_banner -loglevel error -y -i forward.mp4 \
+            -frames:v 1 -q:v 3 "$GITHUB_WORKSPACE/frontend/public/ballers-background-poster.jpg"
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 \
+            "$GITHUB_WORKSPACE/frontend/public/ballers-background-pingpong.mp4"
+
+      - name: Commit generated background assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/public/ballers-background-pingpong.mp4 frontend/public/ballers-background-poster.jpg
+          if ! git diff --cached --quiet; then
+            git commit -m "Add optimized forward-reverse BallersPLAY background video"
+            git push origin HEAD:main
+          fi
