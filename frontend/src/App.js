@@ -16,6 +16,9 @@ const INSTAGRAM_URL =
 const CONTACT_EMAIL = "ballerplay.2024@gmail.com";
 const VIDEO_URL =
   "https://customer-assets.emergentagent.com/job_ba99f296-f872-493d-ac5a-68fd843b5323/artifacts/y2g5eoch_A_cinematic%2C_high-contrast_animation_based_on_a_white_silhouette_logo_of_a_soccer_player_on_a_solid__seed1924638786.mp4";
+// Generated from the existing football clip: forwards, then backwards, forever.
+const PINGPONG_VIDEO_URL = "/ballers-background-pingpong.mp4";
+const PINGPONG_VIDEO_POSTER = "/ballers-background-poster.jpg";
 const LOGO_SRC = "/LogoEnhanced2.png";
 
 const LogoMark = ({ imgStyle, fallbackId }) => (
@@ -39,6 +42,8 @@ const LogoMark = ({ imgStyle, fallbackId }) => (
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Preserve the existing background if the generated file is not yet deployed.
+  const [useOriginalBackground, setUseOriginalBackground] = useState(false);
 
   // Navbar transparent -> solid on scroll
   useEffect(() => {
@@ -91,16 +96,30 @@ export default function App() {
   return (
     <div className="bp" data-testid="ballersplay-page">
       {/* Cinematic football backdrop, dimmed to protect typography */}
-      <div className="video-bg">
+      <div className="video-bg" aria-hidden="true">
         <video
+          key={useOriginalBackground ? "original-backdrop" : "pingpong-backdrop"}
+          src={useOriginalBackground ? VIDEO_URL : PINGPONG_VIDEO_URL}
+          poster={useOriginalBackground ? undefined : PINGPONG_VIDEO_POSTER}
           autoPlay
           muted
           loop
           playsInline
-          poster="https://images.unsplash.com/photo-1762013315117-1c8005ad2b41?auto=format&fit=crop&w=1600&q=70"
-        >
-          <source src={VIDEO_URL} type="video/mp4" />
-        </video>
+          preload="auto"
+          controls={false}
+          disablePictureInPicture
+          onCanPlay={(event) => {
+            const video = event.currentTarget;
+            video.muted = true;
+            const playRequest = video.play();
+            if (playRequest && typeof playRequest.catch === "function") {
+              playRequest.catch(() => {});
+            }
+          }}
+          onError={() => {
+            if (!useOriginalBackground) setUseOriginalBackground(true);
+          }}
+        />
       </div>
 
       {/* NAVBAR */}
