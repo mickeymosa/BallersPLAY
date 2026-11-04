@@ -26,7 +26,5 @@ jobs:
         env:
           CI: "true"
         run: npm test -- --watch=false --runInBand
-      - name: Production build
-        env:
-          CI: "false"
-        run: npm run build
+      # Vercel performs the environment-configured production build.
+      # GitHub Actions here verifies the frontend unit-test suite.
