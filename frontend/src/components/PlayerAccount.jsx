@@ -37,11 +37,13 @@ export default function PlayerAccount() {
   useEffect(() => {
     if (!supabase) {setAuthLoading(false);setNotice("Account service is unavailable. Please try again later.");return;}
     let active=true;
+    let authEventReceived=false;
     // INITIAL_SESSION is authoritative. Avoid late getSession responses overwriting a new sign-in.
     const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
       if(!active)return;
       if(event==="PASSWORD_RECOVERY")setRecovery(true);
       if(["INITIAL_SESSION","SIGNED_IN","SIGNED_OUT","TOKEN_REFRESHED","USER_UPDATED"].includes(event)){
+        authEventReceived=true;
         setUser(previous=>previous?.id===session?.user?.id?previous:session?.user||null);
         setAuthLoading(false);
       }
@@ -50,7 +52,7 @@ export default function PlayerAccount() {
     supabase.auth.getSession().then(({data,error})=>{
       if(!active)return;
       if(error)setNotice("Could not restore your session: "+error.message);
-      setUser(previous=>previous||data?.session?.user||null);
+      if(!authEventReceived)setUser(data?.session?.user||null);
       setAuthLoading(false);
     }).catch(error=>{if(active){setNotice("Session check failed. Refresh or sign in again.");setAuthLoading(false);}});
     return ()=>{active=false;subscription.unsubscribe();};
@@ -75,9 +77,9 @@ export default function PlayerAccount() {
   }, [user?.id,profileRetry]);
   useEffect(() => {
     if (!user?.id || !profile) {setStats(null);setCardStats(null);setCandidates([]);return;}
-    supabase.rpc("ballersplay_profile_stats",{p_player_id:user.id}).then(({data})=>setStats(data?.[0]||null));
-    supabase.rpc("ballersplay_player_card",{p_player_id:user.id}).then(({data,error})=>{if(!error)setCardStats(data?.[0]||null);});
-    supabase.rpc("ballersplay_review_candidates").then(({data})=>setCandidates(data||[]));
+    supabase.rpc("ballersplay_profile_stats",{p_player_id:user.id}).then(({data,error})=>{if(!error)setStats(data?.[0]||null);}).catch(()=>{});
+    supabase.rpc("ballersplay_player_card",{p_player_id:user.id}).then(({data,error})=>{if(!error)setCardStats(data?.[0]||null);}).catch(()=>{});
+    supabase.rpc("ballersplay_review_candidates").then(({data,error})=>{if(!error)setCandidates(data||[]);}).catch(()=>{});
   }, [user?.id,profile]);
   async function submitReview(event) {
     event.preventDefault();
