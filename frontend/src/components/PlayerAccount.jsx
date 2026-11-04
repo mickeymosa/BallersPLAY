@@ -109,17 +109,27 @@ export default function PlayerAccount() {
   }
   async function uploadAvatar(event) {
     const file=event.target.files?.[0];
-    if (!file) return;
-    if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size>2*1024*1024) return setNotice("Choose a JPG, PNG or WebP image under 2 MB.");
+    if(!file||!user)return;
+    if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>2*1024*1024){
+      setNotice("Choose a JPG, PNG or WebP image under 2 MB.");return;
+    }
     setAvatarBusy(true);setNotice("");
     const ext={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"}[file.type];
     const path=user.id+"/avatar-"+crypto.randomUUID()+"."+ext;
-    const {error}=await supabase.storage.from("player-avatars").upload(path,file,{contentType:file.type,upsert:false});
-    if (error) {setNotice(error.message);setAvatarBusy(false);return;}
-    const result=await supabase.from("player_profiles").update({avatar_path:path,updated_at:new Date().toISOString()}).eq("id",user.id);
-    if(result.error) setNotice(result.error.message);
-    else setProfile(p=>({...p,avatar_path:path}));
-    setAvatarBusy(false);
+    try{
+      const {error:uploadError}=await supabase.storage.from("player-avatars").upload(path,file,{contentType:file.type,upsert:false});
+      if(uploadError)throw uploadError;
+      const {data,error}=await supabase.from("player_profiles")
+        .update({avatar_path:path,updated_at:new Date().toISOString()})
+        .eq("id",user.id).select("avatar_path").single();
+      if(error){
+        await supabase.storage.from("player-avatars").remove([path]).catch(()=>{});
+        throw error;
+      }
+      setProfile(p=>({...p,avatar_path:data.avatar_path}));
+      setNotice("Profile photo saved.");
+    }catch(error){setNotice("Photo upload failed: "+(error.message||"Please try again."));}
+    finally{setAvatarBusy(false);event.target.value="";}
   }
   const avatarUrl=profile?.avatar_path ? supabase?.storage.from("player-avatars").getPublicUrl(profile.avatar_path).data.publicUrl : null;
   const update = (key, value) => setForm(prev => ({...prev,[key]:value}));
@@ -161,19 +171,23 @@ export default function PlayerAccount() {
   }
   async function saveProfile(event) {
     event.preventDefault();
-    if (!validPhone(profileForm.phone.trim()) || profileForm.full_name.trim().length < 2) {
-      setNotice("Enter your name and a valid international phone number."); return;
+    if(!validPhone(profileForm.phone.trim())||profileForm.full_name.trim().length<2){
+      setNotice("Enter your name and a valid international phone number.");return;
     }
-    setBusy(true); setNotice("");
-    const {error} = await supabase.rpc("ballersplay_complete_player_profile",{
-      p_full_name:profileForm.full_name.trim(),p_phone:profileForm.phone.trim()
-    });
-    if (error) setNotice(error.message);
-    else {
-      const {data} = await supabase.from("player_profiles").select("full_name,phone,username,avatar_key,avatar_path,avatar_config,is_verified").eq("id",user.id).maybeSingle();
-      if(data){setProfile(data);setNotice("Profile details saved.");}else{setProfileRetry(x=>x+1);setNotice("Profile updated. Reloading details…");}
-    }
-    setBusy(false);
+    setBusy(true);setNotice("");
+    try{
+      const {error}=await supabase.rpc("ballersplay_complete_player_profile",{
+        p_full_name:profileForm.full_name.trim(),p_phone:profileForm.phone.trim()
+      });
+      if(error)throw error;
+      const {data,error:readError}=await supabase.from("player_profiles")
+        .select("full_name,phone,username,avatar_key,avatar_path,avatar_config,is_verified")
+        .eq("id",user.id).single();
+      if(readError)throw readError;
+      setProfile(data);
+      setNotice("Profile details saved.");
+    }catch(error){setNotice("Could not save profile: "+(error.message||"Please retry."));}
+    finally{setBusy(false);}
   }
   async function updateUsername(event) {
     event.preventDefault();
