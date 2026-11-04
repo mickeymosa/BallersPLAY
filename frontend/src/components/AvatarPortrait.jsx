@@ -1,57 +1,64 @@
-import React,{useEffect,useState} from "react";
-import {chibiImage} from "./chibiCatalog";
+import React, {useId} from "react";
 
-// Original late-2000s-era football-game portrait aesthetic.
-// Vector portraits ship with the app: no broken external image assets.
-export default function AvatarPortrait({id="chibi-01",config={},size=150,className="",alt="Footballer portrait"}){
- const [failed,setFailed]=useState(false);
- const asset=chibiImage(id)||chibiImage("chibi-01");
- useEffect(()=>setFailed(false),[asset]);
- const n=Math.max(0,Math.min(29,(parseInt(String(id).split("-")[1],10)||1)-1));
- const skins=["#d9a078","#a96745","#f0c4a1","#78452e","#c58b64","#9e603e"];
- const hairs=["#241a17","#30241e","#ae7844","#171b22","#51352c","#e1b66e","#452718","#242324"];
- const shirts=["#dce7f0","#2254a2","#bf282c","#171c23","#e7c931","#18806b","#f5f5f5"];
- const faces=["M64 69 Q62 37 95 33 Q128 37 127 71 L123 104 Q114 124 96 128 Q78 123 69 106Z",
- "M66 72 Q62 37 94 34 Q126 38 125 75 Q122 113 98 129 Q74 121 68 102Z",
- "M64 67 Q67 35 97 35 Q129 37 128 71 L121 110 Q110 125 95 128 Q77 121 68 102Z"];
- const skin=skins[n%skins.length],hair=hairs[(n*3+Math.floor(n/5))%hairs.length],shirt=config?.jersey||shirts[n%shirts.length];
- const beard=n%5===1||n%7===2;
- const longHair=n%6===2||n%6===4;
- const crop=n%7===3;
- const highHair=n%6===0||n%6===5;
- const uid="bpface"+n;
- const hairPath=crop?"M65 70 Q57 40 75 33 Q101 20 121 39 L127 70 Q116 49 96 49 Q78 50 65 70Z":
- longHair?"M62 76 Q49 43 66 24 Q86 4 119 21 Q141 36 128 78 L132 120 L120 117 L118 58 Q99 44 76 53 L72 110 L60 117Z":
- highHair?"M62 76 L58 43 L66 25 L73 31 L82 15 L91 25 L106 11 L115 27 L129 21 L127 48 L133 72 Q114 47 95 50 Q75 48 62 76Z":
- "M62 77 Q52 40 77 24 Q105 11 125 35 L132 74 Q121 49 99 47 Q78 49 62 77Z";
- return <span className={"bp-avatar-portrait "+className} style={{display:"block",width:"100%",height:"100%",overflow:"hidden"}} role="img" aria-label={alt}>
- {!failed && asset ? <img src={asset} alt="" loading="lazy" onError={()=>setFailed(true)} style={{display:"block",width:"100%",height:"100%",objectFit:"cover",objectPosition:"50% 28%"}}/> :
- <svg width={size} height={size} viewBox="0 0 190 192" preserveAspectRatio="xMidYMid slice" style={{display:"block",width:"100%",height:"100%"}}>
- <defs>
-  <radialGradient id={uid+"bg"} cx="52%" cy="22%" r="85%"><stop stopColor="#53789b"/><stop offset=".53" stopColor="#1d384f"/><stop offset="1" stopColor="#09131d"/></radialGradient>
-  <linearGradient id={uid+"skin"} x1="0" y1="0" x2="1" y2=".65"><stop stopColor="#f0cba9"/><stop offset=".24" stopColor={skin}/><stop offset=".68" stopColor={skin}/><stop offset="1" stopColor="#60382c"/></linearGradient>
-  <linearGradient id={uid+"hair"} x1="0" x2="1" y1="0" y2="1"><stop stopColor="#775643"/><stop offset=".27" stopColor={hair}/><stop offset="1" stopColor="#100e12"/></linearGradient>
-  <linearGradient id={uid+"kit"} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ffffff" stopOpacity=".22"/><stop offset=".28" stopColor={shirt}/><stop offset="1" stopColor="#101a28"/></linearGradient>
-  <radialGradient id={uid+"light"}><stop stopColor="#fff"/><stop offset="1" stopColor="#fff" stopOpacity="0"/></radialGradient>
- </defs>
- <rect width="190" height="192" fill={"url(#"+uid+"bg)"}/>
- <circle cx="23" cy="22" r="25" fill={"url(#"+uid+"light)"} opacity=".8"/><circle cx="158" cy="29" r="28" fill={"url(#"+uid+"light)"} opacity=".65"/>
- <g opacity=".35"><path d="M0 159 Q100 119 190 156" stroke="#74b18a" strokeWidth="12" fill="none"/></g>
- <path d="M10 192 Q15 149 65 143 L123 143 Q170 148 183 192Z" fill={"url(#"+uid+"kit)"} stroke="#0b141e" strokeWidth="4"/>
- <path d="M65 144 L94 166 L124 144 M91 166 L91 192" fill="none" stroke="#e7edf3" strokeOpacity=".75" strokeWidth="4"/>
- <path d="M79 116 L78 152 Q94 163 111 150 L108 116" fill={skin} stroke="#663d2f" strokeWidth="2"/>
- <ellipse cx="64" cy="81" rx="8" ry="15" fill={skin}/><ellipse cx="127" cy="81" rx="8" ry="15" fill={skin}/>
- <path d={faces[n%faces.length]} fill={"url(#"+uid+"skin)"} stroke="#513326" strokeOpacity=".65" strokeWidth="1.4"/>
- <path d="M67 81 Q70 57 85 53 M122 81 Q119 57 106 53" fill="none" stroke="#ffdbbb" strokeOpacity=".22" strokeWidth="5"/>
- <path d="M82 90 L94 83 L101 100 L92 102" stroke="#7e4935" strokeWidth="1.4" fill="none" opacity=".6"/>
- <path d={hairPath} fill={"url(#"+uid+"hair)"} stroke="#201615" strokeWidth="2"/>
- <path d="M70 46 Q89 24 122 41 M73 54 Q90 35 125 49" fill="none" stroke="#f1d6aa" strokeOpacity=".14" strokeWidth="2"/>
- <path d="M72 80 Q81 74 91 79 M103 78 Q114 74 122 80" fill="none" stroke={hair} strokeWidth="3.2" strokeLinecap="round"/>
- <path d="M76 84 L90 84 M105 84 L119 84" stroke="#f4eddf" strokeWidth="3.6"/>
- <ellipse cx="84" cy="85" rx="2.5" ry="3.3" fill="#27201d"/><ellipse cx="110" cy="85" rx="2.5" ry="3.3" fill="#27201d"/>
- <path d="M97 91 L93 103 L102 104" fill="none" stroke="#844e3b" strokeWidth="1.8"/>
- <path d="M84 113 Q97 118 110 112" stroke="#623a30" strokeWidth="2" fill="none" strokeLinecap="round"/>
- {beard&&<><path d="M70 104 Q76 124 95 132 Q115 129 123 103 L115 118 Q94 140 78 117Z" fill={hair} opacity=".83"/><path d="M84 111 Q97 108 110 111" stroke={hair} strokeWidth="4" strokeLinecap="round"/></>}
- <path d="M130 0 L190 0 L190 192 L165 192 Q183 92 130 0" fill="#071321" opacity=".14"/>
- </svg>}</span>;
+// Original, self-contained big-head football characters. No network images or external sprites.
+// Keep legacy chibi-XX IDs so existing players retain their saved choices.
+const characters=[
+ {skin:"#e5a26f",hair:"#171b2c",eyes:"#192f54",style:0,expression:0},
+ {skin:"#a86a48",hair:"#39231b",eyes:"#593621",style:1,expression:1},
+ {skin:"#f3bc8b",hair:"#e7bc37",eyes:"#2d81bb",style:2,expression:0},
+ {skin:"#c88962",hair:"#242424",eyes:"#27272c",style:3,expression:2},
+ {skin:"#855137",hair:"#111b23",eyes:"#264d32",style:4,expression:1},
+ {skin:"#dfaa7e",hair:"#643b2e",eyes:"#70412c",style:5,expression:0}
+];
+const hairStyles=[
+ "M45 91L34 66L48 67L42 44L61 52L72 25L84 39L106 19L122 36L150 24L155 47L178 41L173 66L188 77L166 102L157 67Q120 52 82 72L55 103Z",
+ "M39 101Q22 42 80 30Q122 13 171 52L180 101Q162 64 132 67Q88 46 51 102Z",
+ "M35 96L40 55L55 60L72 25L91 41L107 14L131 36L155 28L161 52L181 60L172 89Q112 45 59 104Z",
+ "M48 95Q45 40 95 40Q158 34 169 97Q134 72 106 75Q76 70 48 95Z",
+ "M40 103Q35 49 70 43L74 28L93 42L111 24L125 43L153 39L169 60L174 105Q141 69 110 68Q69 71 40 103Z",
+ "M39 99Q24 55 67 39Q96 18 131 40Q159 27 177 64L173 106Q155 61 118 62Q79 52 48 104Z"
+];
+export default function AvatarPortrait({id="chibi-01",config={},size=150,className="",alt="BallersPlay big-head football avatar"}){
+ const uid=useId().replace(/:/g,"");
+ const raw=Number.parseInt(String(id).split("-")[1],10);
+ const n=Number.isFinite(raw)?Math.max(0,(raw-1)%characters.length):0;
+ const c=characters[n];
+ const shirt=/^#[0-9a-fA-F]{6}$/.test(config?.jersey||"")?config.jersey:"#1451b5";
+ const dark=n%2===0?"#071a3c":"#12243c";
+ return <span className={"bp-avatar-portrait bp-headsoccer-avatar "+className} role="img" aria-label={alt} style={{display:"block",height:"100%",width:"100%",overflow:"hidden"}}>
+  <svg width={size} height={size} viewBox="0 0 220 230" preserveAspectRatio="xMidYMid meet" style={{width:"100%",height:"100%",display:"block"}} aria-hidden="true">
+   <defs>
+    <radialGradient id={uid+"bg"} cx="50%" cy="38%"><stop stopColor="#3174b1"/><stop offset="1" stopColor="#0b1b37"/></radialGradient>
+    <linearGradient id={uid+"face"} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff0c6"/><stop offset=".27" stopColor={c.skin}/><stop offset="1" stopColor="#74422e"/></linearGradient>
+    <linearGradient id={uid+"kit"} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#65b7ff"/><stop offset=".35" stopColor={shirt}/><stop offset="1" stopColor={dark}/></linearGradient>
+   </defs>
+   <rect width="220" height="230" fill={"url(#"+uid+"bg)"}/>
+   <g opacity=".27" stroke="#92d5ff" fill="none"><path d="M-5 183Q105 113 225 180M0 210Q105 138 220 210"/><circle cx="110" cy="186" r="48"/></g>
+   <ellipse cx="110" cy="221" rx="76" ry="13" fill="#020c20" opacity=".55"/>
+   {/* Tiny body and boots exaggerate the head-to-body scale. */}
+   <path d="M78 172Q61 177 54 192L47 218L172 218L164 191Q156 176 138 172Z" fill={"url(#"+uid+"kit)"} stroke="#091524" strokeWidth="6" strokeLinejoin="round"/>
+   <path d="M77 182L107 197L140 182" fill="none" stroke="#ffd44c" strokeWidth="7"/>
+   <rect x="81" y="211" width="22" height="14" rx="4" fill="#101b30" stroke="#f7f9ff" strokeWidth="3"/>
+   <rect x="119" y="211" width="22" height="14" rx="4" fill="#101b30" stroke="#f7f9ff" strokeWidth="3"/>
+   {/* Oversized face, ears and expressive eyebrows: arcade soccer aesthetic. */}
+   <ellipse cx="42" cy="114" rx="15" ry="23" fill={c.skin} stroke="#151923" strokeWidth="6"/>
+   <ellipse cx="179" cy="114" rx="15" ry="23" fill={c.skin} stroke="#151923" strokeWidth="6"/>
+   <path d="M45 105Q43 48 109 44Q179 44 177 107L167 145Q153 181 110 181Q65 177 52 146Z" fill={"url(#"+uid+"face)"} stroke="#151923" strokeWidth="7" strokeLinejoin="round"/>
+   <path d={hairStyles[c.style]} fill={c.hair} stroke="#10121b" strokeWidth="7" strokeLinejoin="round" strokeLinecap="round"/>
+   <path d="M59 80Q88 56 116 65" stroke="#ffffff" strokeOpacity=".2" strokeWidth="7" fill="none" strokeLinecap="round"/>
+   <path d="M64 105L100 97M123 98L157 104" stroke={c.hair} strokeWidth="9" strokeLinecap="round"/>
+   <ellipse cx="83" cy="117" rx="20" ry="20" fill="#fffdf5" stroke="#191b20" strokeWidth="5"/>
+   <ellipse cx="140" cy="117" rx="20" ry="20" fill="#fffdf5" stroke="#191b20" strokeWidth="5"/>
+   <ellipse cx="89" cy="118" rx="8.2" ry="11" fill={c.eyes}/>
+   <ellipse cx="135" cy="118" rx="8.2" ry="11" fill={c.eyes}/>
+   <circle cx="91" cy="113" r="3.5" fill="white"/><circle cx="137" cy="113" r="3.5" fill="white"/>
+   <path d="M110 118L103 139L115 141" fill="none" stroke="#9a553d" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+   {c.expression===0?<path d="M87 151Q110 171 136 151Q110 178 87 151Z" fill="#fffbec" stroke="#462b30" strokeWidth="4"/>:
+    c.expression===1?<path d="M92 157Q110 148 130 155" fill="none" stroke="#442b32" strokeWidth="5" strokeLinecap="round"/>:
+    <path d="M92 151Q110 171 132 148" fill="none" stroke="#493037" strokeWidth="6" strokeLinecap="round"/>}
+   {(n===1||n===5)&&<path d="M88 149Q108 166 135 149L130 163Q109 185 91 163Z" fill={c.hair} opacity=".58"/>}
+   <path d="M56 141Q73 167 89 171" fill="none" stroke="#ffecc6" strokeWidth="4" strokeOpacity=".25"/>
+   <circle cx="181" cy="48" r="7" fill="#c6ff00"/><circle cx="30" cy="37" r="4" fill="#fdd460"/>
+  </svg>
+ </span>;
 }
