@@ -32,35 +32,53 @@ export default function PlayerAccount() {
   const [form, setForm] = useState({ full_name: "", phone: "", email: "", password: "", confirm: "" });
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [profileError,setProfileError]=useState("");
+  const [profileRetry,setProfileRetry]=useState(0);
   useEffect(() => {
-    if (!supabase) {setAuthLoading(false);return;}
-    let mounted = true;
-    supabase.auth.getSession().then(({data,error}) => {
-      if (!mounted) return;
-      if (error) setNotice("Session restore failed: " + error.message);
-      setUser(data.session?.user || null);
-      setAuthLoading(false);
-    }).catch(error => {if(mounted){setAuthLoading(false);setNotice(error.message || "Unable to restore session.");}});
-    const {data:{subscription}} = supabase.auth.onAuthStateChange((event,session) => {
-      if (!mounted) return;
+    if (!supabase) {setAuthLoading(false);setNotice("Account service is unavailable. Please try again later.");return;}
+    let active=true;
+    // INITIAL_SESSION is authoritative. Avoid late getSession responses overwriting a new sign-in.
+    const {data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
+      if(!active)return;
       if(event==="PASSWORD_RECOVERY")setRecovery(true);
-      setUser(session?.user || null);
-      setAuthLoading(false);
+      if(["INITIAL_SESSION","SIGNED_IN","SIGNED_OUT","TOKEN_REFRESHED","USER_UPDATED"].includes(event)){
+        setUser(previous=>previous?.id===session?.user?.id?previous:session?.user||null);
+        setAuthLoading(false);
+      }
     });
-    return () => {mounted=false;subscription.unsubscribe();};
+    // If initialization fails, don't leave the user on an endless loading screen.
+    supabase.auth.getSession().then(({data,error})=>{
+      if(!active)return;
+      if(error)setNotice("Could not restore your session: "+error.message);
+      setUser(previous=>previous||data?.session?.user||null);
+      setAuthLoading(false);
+    }).catch(error=>{if(active){setNotice("Session check failed. Refresh or sign in again.");setAuthLoading(false);}});
+    return ()=>{active=false;subscription.unsubscribe();};
   }, []);
   useEffect(() => {
-    if (!user || !supabase) { setProfile(null); setProfileLoading(false); return; }
-    setProfileLoading(true);
-    supabase.from("player_profiles").select("full_name,phone,username,avatar_key,avatar_path,avatar_config,is_verified").eq("id",user.id).maybeSingle()
-      .then(({data,error}) => { setProfileLoading(false); if (error) setNotice("Could not load your profile: "+error.message); if (!error) { setProfile(data); setUsernameInput(data?.username || ""); setProfileForm({full_name:data?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || "",phone:data?.phone || ""}); } });
-  }, [user]);
+    if (!user?.id || !supabase) {setProfile(null);setProfileError("");setProfileLoading(false);return;}
+    let active=true;
+    setProfileLoading(true);setProfileError("");
+    supabase.from("player_profiles")
+      .select("full_name,phone,username,avatar_key,avatar_path,avatar_config,is_verified")
+      .eq("id",user.id).maybeSingle()
+      .then(({data,error})=>{
+        if(!active)return;
+        if(error){setProfileError("Could not load your profile. "+error.message);return;}
+        setProfile(data);
+        setUsernameInput(data?.username||"");
+        setProfileForm({full_name:data?.full_name||user.user_metadata?.full_name||user.user_metadata?.name||"",phone:data?.phone||""});
+      })
+      .catch(()=>{if(active)setProfileError("Network error while loading your profile. Please retry.");})
+      .finally(()=>{if(active)setProfileLoading(false);});
+    return ()=>{active=false;};
+  }, [user?.id,profileRetry]);
   useEffect(() => {
-    if (!user || !profile) {setStats(null);return;}
+    if (!user?.id || !profile) {setStats(null);setCardStats(null);setCandidates([]);return;}
     supabase.rpc("ballersplay_profile_stats",{p_player_id:user.id}).then(({data})=>setStats(data?.[0]||null));
     supabase.rpc("ballersplay_player_card",{p_player_id:user.id}).then(({data,error})=>{if(!error)setCardStats(data?.[0]||null);});
     supabase.rpc("ballersplay_review_candidates").then(({data})=>setCandidates(data||[]));
-  }, [user,profile]);
+  }, [user?.id,profile]);
   async function submitReview(event) {
     event.preventDefault();
     const target=candidates.find(c=>c.match_id+":"+c.player_id===reviewTarget);
@@ -75,14 +93,17 @@ export default function PlayerAccount() {
     setBusy(false);
   }
   async function saveCustomizedAvatar(key, config) {
-    if (!profile || !user) return false;
+    if(!profile||!user||avatarBusy)return false;
     setAvatarBusy(true);setNotice("");
-    const {error}=await supabase.from("player_profiles").update({
-      avatar_key:key,avatar_config:config,avatar_path:null,updated_at:new Date().toISOString()
-    }).eq("id",user.id);
-    if(error){setNotice("Avatar could not be saved: "+error.message);setAvatarBusy(false);return false;}
-    setProfile(p=>({...p,avatar_key:key,avatar_config:config,avatar_path:null}));
-    setAvatarBusy(false);return true;
+    try{
+      const {data,error}=await supabase.from("player_profiles").update({
+        avatar_key:key,avatar_config:config,avatar_path:null,updated_at:new Date().toISOString()
+      }).eq("id",user.id).select("avatar_key,avatar_config,avatar_path").single();
+      if(error)throw error;
+      setProfile(p=>({...p,...data}));
+      return true;
+    }catch(error){setNotice("Avatar could not be saved: "+(error.message||"Please retry."));return false;}
+    finally{setAvatarBusy(false);}
   }
   async function uploadAvatar(event) {
     const file=event.target.files?.[0];
@@ -148,8 +169,7 @@ export default function PlayerAccount() {
     if (error) setNotice(error.message);
     else {
       const {data} = await supabase.from("player_profiles").select("full_name,phone,username,avatar_key,avatar_path,avatar_config,is_verified").eq("id",user.id).maybeSingle();
-      setProfile(data);
-      setNotice("Your account is ready to book.");
+      if(data){setProfile(data);setNotice("Profile details saved.");}else{setProfileRetry(x=>x+1);setNotice("Profile updated. Reloading details…");}
     }
     setBusy(false);
   }
@@ -191,7 +211,7 @@ export default function PlayerAccount() {
     </form></section>;
   if (user) return <section className="bp-account-panel">
     <h1>My BallersPlay account</h1><p>Signed in as {user.email}</p><p><a href="/account" className="btn btn-primary">My Profile</a></p>
-    {profileLoading ? <p>Loading your profile…</p> : profile ? <p>{profile.full_name} · {profile.phone}</p> :
+    {profileLoading ? <p role="status">Loading your profile…</p> : profileError ? <div role="alert"><p>{profileError}</p><button type="button" onClick={()=>setProfileRetry(x=>x+1)}>Retry loading profile</button></div> : profile ? <p>{profile.full_name} · {profile.phone}</p> :
       <form className="bp-native-form" onSubmit={saveProfile}>
         <p>Complete your profile to book matches. A phone number is required, including for Google sign-in.</p>
         <label>Full name<input required minLength={2} maxLength={120} value={profileForm.full_name} onChange={e=>setProfileForm(p=>({...p,full_name:e.target.value}))}/></label>
@@ -225,6 +245,12 @@ export default function PlayerAccount() {
       <AvatarCustomizer profile={profile} stats={{...stats,...cardStats}} onSave={saveCustomizedAvatar} busy={avatarBusy}/>
       <label className="bp-upload-label">Or upload your own profile photo (JPG, PNG or WebP, max 2 MB)<input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={uploadAvatar}/></label>
       <h2>Player profile</h2>
+      <form className="bp-native-form" onSubmit={saveProfile}>
+        <p>Update your contact details. Your booking confirmation uses this information.</p>
+        <label>Full name<input required minLength={2} maxLength={120} autoComplete="name" value={profileForm.full_name} onChange={e=>setProfileForm(p=>({...p,full_name:e.target.value}))}/></label>
+        <label>Phone (international format)<input type="tel" required autoComplete="tel" placeholder="+48123456789" pattern="[+][1-9][0-9]{7,14}" value={profileForm.phone} onChange={e=>setProfileForm(p=>({...p,phone:e.target.value}))}/></label>
+        <button disabled={busy}>{busy?"Saving…":"Update contact details"}</button>
+      </form>
       <p>Your username is your public identity. Other players can use it to find you later.</p>
       <form className="bp-native-form" onSubmit={updateUsername}>
         <label>Choose your username
@@ -246,7 +272,7 @@ export default function PlayerAccount() {
     </div>}
     {notice && <p role="status">{notice}</p>}
     <div className="bp-account-actions"><a href="/matches" className="btn btn-primary">Find matches</a>
-    <button onClick={() => supabase.auth.signOut()}>Sign out</button></div>
+    <button type="button" onClick={async()=>{const {error}=await supabase.auth.signOut();if(error)setNotice("Sign out failed: "+error.message);}}>Sign out</button></div>
   </section>;
   return <section className="bp-auth-fullscreen">
     <div className="bp-auth-video-layer" aria-hidden="true">
