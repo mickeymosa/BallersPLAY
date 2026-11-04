@@ -54,7 +54,7 @@ export default function PlayerAccount() {
       if(error)setNotice("Could not restore your session: "+error.message);
       if(!authEventReceived)setUser(data?.session?.user||null);
       setAuthLoading(false);
-    }).catch(error=>{if(active){setNotice("Session check failed. Refresh or sign in again.");setAuthLoading(false);}});
+    }).catch(()=>{if(active){setNotice("Session check failed. Refresh or sign in again.");setAuthLoading(false);}});
     return ()=>{active=false;subscription.unsubscribe();};
   }, []);
   useEffect(() => {
@@ -74,13 +74,13 @@ export default function PlayerAccount() {
       .catch(()=>{if(active)setProfileError("Network error while loading your profile. Please retry.");})
       .finally(()=>{if(active)setProfileLoading(false);});
     return ()=>{active=false;};
-  }, [user?.id,profileRetry]);
+  }, [user,profileRetry]);
   useEffect(() => {
     if (!user?.id || !profile) {setStats(null);setCardStats(null);setCandidates([]);return;}
     supabase.rpc("ballersplay_profile_stats",{p_player_id:user.id}).then(({data,error})=>{if(!error)setStats(data?.[0]||null);}).catch(()=>{});
     supabase.rpc("ballersplay_player_card",{p_player_id:user.id}).then(({data,error})=>{if(!error)setCardStats(data?.[0]||null);}).catch(()=>{});
     supabase.rpc("ballersplay_review_candidates").then(({data,error})=>{if(!error)setCandidates(data||[]);}).catch(()=>{});
-  }, [user?.id,profile]);
+  }, [user,profile]);
   async function submitReview(event) {
     event.preventDefault();
     const target=candidates.find(c=>c.match_id+":"+c.player_id===reviewTarget);
