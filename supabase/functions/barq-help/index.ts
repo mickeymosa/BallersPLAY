@@ -70,6 +70,9 @@ Deno.serve(async(req:Request)=>{
     const contents=history.map((m:{role:string;content:string})=>({
       role:m.role==="assistant"?"model":"user",parts:[{text:m.content}]
     }));
+    // The React chat starts with a welcome message from BARQ. Gemini needs
+    // the actual conversation to start with the first visitor turn.
+    while(contents.length&&contents[0].role==="model")contents.shift();
     contents.push({role:"user",parts:[{text:message}]});
     const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent",{
       method:"POST",
