@@ -41,8 +41,8 @@ Deno.serve(async(req:Request)=>{
   const key=Deno.env.get("GEMINI_API_KEY");
   const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const supabaseUrl=Deno.env.get("SUPABASE_URL");
-  if(key && serviceKey && supabaseUrl){
-   // Enforce per-source hourly quota before making a paid AI API call.
+  if(key && serviceKey && supabaseUrl && Deno.env.get("BARQ_AI_ENABLED")!=="false"){
+   // Enforce per-source hourly quota before making any AI API call.
    // No raw IP address is stored in the database.
    const clientAddress=(req.headers.get("cf-connecting-ip")||req.headers.get("x-forwarded-for")||"unknown").split(",")[0].trim().slice(0,100);
    const salt=Deno.env.get("BARQ_RATE_LIMIT_SALT")||serviceKey;
@@ -61,10 +61,24 @@ Deno.serve(async(req:Request)=>{
    }catch{
     return new Response(JSON.stringify(fallback(message)),{headers:corsHeaders(origin)});
    }
+   // A second, global daily budget is shared by every visitor and every IP.
+   // If its atomic database check fails, fail closed to free FAQ responses.
+   try{
+    const quota=await fetch(supabaseUrl+"/rest/v1/rpc/barq_consume_daily_ai_quota",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","apikey":serviceKey,"Authorization":"Bearer "+serviceKey},
+      body:JSON.stringify({p_limit:40}),
+      signal:AbortSignal.timeout(3500)
+    });
+    if(!quota.ok||await quota.json()!==true){
+      return new Response(JSON.stringify(fallback(message)),{headers:corsHeaders(origin)});
+    }
+   }catch{
+    return new Response(JSON.stringify(fallback(message)),{headers:corsHeaders(origin)});
+   }
    try{
     // Pin a cost-efficient model with an advertised free tier. Override via BARQ_GEMINI_MODEL.
-    const model=Deno.env.get("BARQ_GEMINI_MODEL")||"gemini-3.5-flash-lite";
-    if(!/^gemini-[a-z0-9.-]{2,64}$/.test(model))throw new Error("Invalid Gemini model configuration");
+    const model="gemini-3.5-flash-lite"; // Explicit free-tier model; no arbitrary paid-model override.
     // Gemini accepts alternating user/model turns. Remove an intro greeting from history
     // and cap the total context to prevent unbounded prompt spending.
     const contents=history.map((m:{role:string;content:string})=>({
