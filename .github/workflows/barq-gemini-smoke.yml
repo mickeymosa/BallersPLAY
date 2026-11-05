@@ -17,7 +17,7 @@ jobs:
             -X POST 'https://dbrsgwdlicajlbtbpylj.supabase.co/functions/v1/barq-help' \
             -H 'Origin: https://ballers-play-mickeymosas-projects.vercel.app' \
             -H 'Content-Type: application/json' \
-            --data '{"message":"How do I request a place in a BallersPlay game and when is it confirmed?"}')
+            --data '{"message":"How do I request a place in a BallersPlay game and when is it confirmed?","history":[{"role":"assistant","content":"Hi! I am BARQ, your BallersPlay guide."}]}')
           echo "BARQ endpoint HTTP status: $status"
           test "$status" = "200"
           jq -e '.reply | type=="string" and length>20' /tmp/barq-response.json > /dev/null
