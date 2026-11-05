@@ -1,0 +1,27 @@
+name: BARQ Gemini live smoke
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "supabase/functions/barq-help/**"
+      - ".github/workflows/barq-gemini-smoke.yml"
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify deployed BARQ uses Gemini
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --max-time 25 --output /tmp/barq-response.json --write-out '%{http_code}' \
+            -X POST 'https://dbrsgwdlicajlbtbpylj.supabase.co/functions/v1/barq-help' \
+            -H 'Origin: https://ballers-play-mickeymosas-projects.vercel.app' \
+            -H 'Content-Type: application/json' \
+            --data '{"message":"How do I request a place in a BallersPlay game and when is it confirmed?"}')
+          echo "BARQ endpoint HTTP status: $status"
+          test "$status" = "200"
+          jq -e '.reply | type=="string" and length>20' /tmp/barq-response.json > /dev/null
+          mode=$(jq -r '.mode // "unknown"' /tmp/barq-response.json)
+          echo "BARQ response mode: $mode"
+          test "$mode" = "ai" || { echo "Expected Gemini-backed response; FAQ fallback received."; exit 1; }
+          test "$(jq -r '.provider' /tmp/barq-response.json)" = "gemini"
