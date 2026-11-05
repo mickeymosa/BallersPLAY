@@ -1,4 +1,5 @@
 name: BARQ Gemini live smoke
+# Validates the deployed v6 global-quota guard and AI fallback path.
 on:
   workflow_dispatch:
   push:
