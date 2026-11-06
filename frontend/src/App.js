@@ -14,8 +14,6 @@ const ORGANIZER_URL = "https://tally.so/r/Y5Eyaz";
 const INSTAGRAM_URL =
   "https://www.instagram.com/ballers.play?igsh=MXg4MnR2cDdhZWhh&utm_source=qr";
 const CONTACT_EMAIL = "ballerplay.2024@gmail.com";
-const VIDEO_URL =
-  "https://customer-assets.emergentagent.com/job_ba99f296-f872-493d-ac5a-68fd843b5323/artifacts/y2g5eoch_A_cinematic%2C_high-contrast_animation_based_on_a_white_silhouette_logo_of_a_soccer_player_on_a_solid__seed1924638786.mp4";
 // Generated from the existing football clip: forwards, then backwards, forever.
 const PINGPONG_VIDEO_URL = "/ballers-background-pingpong.mp4";
 const PINGPONG_VIDEO_POSTER = "/ballers-background-poster.jpg";
@@ -42,8 +40,6 @@ const LogoMark = ({ imgStyle, fallbackId }) => (
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  // Preserve the existing background if the generated file is not yet deployed.
-  const [useOriginalBackground, setUseOriginalBackground] = useState(false);
 
   // Navbar transparent -> solid on scroll
   useEffect(() => {
@@ -98,9 +94,8 @@ export default function App() {
       {/* Cinematic football backdrop, dimmed to protect typography */}
       <div className="video-bg" aria-hidden="true">
         <video
-          key={useOriginalBackground ? "original-backdrop" : "pingpong-backdrop"}
-          src={useOriginalBackground ? VIDEO_URL : PINGPONG_VIDEO_URL}
-          poster={useOriginalBackground ? undefined : PINGPONG_VIDEO_POSTER}
+          src={PINGPONG_VIDEO_URL}
+          poster={PINGPONG_VIDEO_POSTER}
           autoPlay
           muted
           loop
@@ -115,9 +110,6 @@ export default function App() {
             if (playRequest && typeof playRequest.catch === "function") {
               playRequest.catch(() => {});
             }
-          }}
-          onError={() => {
-            if (!useOriginalBackground) setUseOriginalBackground(true);
           }}
         />
       </div>
